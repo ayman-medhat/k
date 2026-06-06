@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 
 #[Layout('layouts.app')]
 class Manage extends Component
@@ -16,6 +17,8 @@ class Manage extends Component
     use WithPagination;
 
     public $viewMode = 'list';
+
+    #[Url(as: 'categories')]
     public $filterCategory = 'All';
     public $filterStage = '';
 
@@ -69,8 +72,8 @@ class Manage extends Component
                 'notes' => $contact->notes,
                 'parent_id' => null,
                 'mother_id' => null,
-                'grade_id' => $contact->grade_id,
-                'second_language_subject_id' => $contact->second_language_subject_id,
+                'grade_id' => $contact->student?->grade_id,
+                'second_language_subject_id' => $contact->student?->second_language_id,
             ]);
         }
 
@@ -83,22 +86,66 @@ class Manage extends Component
 
     public function render()
     {
+        $user = auth()->user();
+
+        $allowedCategories = match($user->role) {
+            'hr' => ['Employee'],
+            'student_affairs' => ['Student', 'Parent'],
+            'academic' => ['Student'],
+            'control' => ['Student'],
+            default => null,
+        };
+
+        $validCategories = $allowedCategories !== null
+            ? array_merge(['All'], $allowedCategories)
+            : ['All', 'Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'];
+
+        if ($this->filterCategory !== 'All' && $allowedCategories !== null && !in_array($this->filterCategory, $allowedCategories)) {
+            $this->filterCategory = 'All';
+        }
+
         $categoryCounts = Contact::selectRaw("jsonb_array_elements_text(categories) as cat, count(*) as total")
+            ->when($allowedCategories, fn ($q) => $q->where(function ($q) use ($allowedCategories) {
+                foreach ($allowedCategories as $cat) {
+                    $q->orWhereJsonContains('categories', $cat);
+                }
+            }))
             ->groupBy('cat')
             ->pluck('total', 'cat')
             ->toArray();
 
-        $contactsQuery = Contact::with('parent', 'mother', 'grade', 'children')
-            ->when($this->filterCategory !== 'All', fn($q) => $q->whereJsonContains('categories', $this->filterCategory))
+        $contactsQuery = Contact::with('parent', 'mother', 'student.grade', 'children')
+            ->when($allowedCategories, function ($q) use ($allowedCategories) {
+                $q->where(function ($q) use ($allowedCategories) {
+                    foreach ($allowedCategories as $cat) {
+                        $q->orWhereJsonContains('categories', $cat);
+                    }
+                });
+            })
+            ->when($this->filterCategory !== 'All', function ($q) {
+                $categories = array_map('trim', explode(',', $this->filterCategory));
+                $q->where(function ($q) use ($categories) {
+                    foreach ($categories as $cat) {
+                        $q->orWhereJsonContains('categories', $cat);
+                    }
+                });
+            })
             ->when($this->filterCategory === 'Student' && $this->filterStage !== '', function ($q) {
-                $q->whereHas('grade.stages', fn ($sq) => $sq->where('stages.id', $this->filterStage));
+                $q->whereHas('student.grade.stages', fn ($sq) => $sq->where('stages.id', $this->filterStage));
             })
             ->latest();
 
         return view('livewire.contacts.manage', [
             'contacts' => $contactsQuery->paginate(10),
             'categoryCounts' => $categoryCounts,
-            'totalCount' => Contact::count(),
+            'totalCount' => Contact::when($allowedCategories, function ($q) use ($allowedCategories) {
+                $q->where(function ($q) use ($allowedCategories) {
+                    foreach ($allowedCategories as $cat) {
+                        $q->orWhereJsonContains('categories', $cat);
+                    }
+                });
+            })->count(),
+            'allowedCategories' => $validCategories,
         ]);
     }
 }

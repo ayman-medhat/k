@@ -2,13 +2,14 @@
 
 use App\Models\Grade;
 use App\Models\Lead;
+use App\Models\School;
 use App\Models\Section;
 use App\Models\Stage;
 use App\Models\Subject;
 use App\Models\Contact;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', [\App\Http\Controllers\SchoolLandingController::class, 'index']);
 
 Route::get('dashboard', function () {
     return view('dashboard', [
@@ -19,6 +20,7 @@ Route::get('dashboard', function () {
             ['label' => 'Classes', 'count' => Section::count(), 'icon' => '🏫', 'route' => 'sections'],
             ['label' => 'Subjects', 'count' => Subject::count(), 'icon' => '📚', 'route' => 'subjects'],
             ['label' => 'Stages', 'count' => Stage::count(), 'icon' => '🗂️', 'route' => 'stages'],
+            ['label' => 'School', 'count' => School::count(), 'icon' => '🏫', 'route' => 'schools'],
         ],
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -90,5 +92,29 @@ Route::get('stages/create', \App\Livewire\Stages\ManageForm::class)
 Route::get('stages/{stage}/edit', \App\Livewire\Stages\ManageForm::class)
     ->middleware(['auth', 'verified'])
     ->name('stages.edit');
+
+Route::get('students', \App\Livewire\Students\Manage::class)
+    ->middleware(['auth', 'verified'])
+    ->name('students');
+Route::get('students/create', \App\Livewire\Students\ManageForm::class)
+    ->middleware(['auth', 'verified'])
+    ->name('students.create');
+Route::get('students/{student}/edit', \App\Livewire\Students\ManageForm::class)
+    ->middleware(['auth', 'verified'])
+    ->name('students.edit');
+
+Route::get('schools', \App\Livewire\Schools\ManageForm::class)
+    ->middleware(['auth', 'verified'])
+    ->name('schools');
+
+Route::get('users', \App\Livewire\Users\Manage::class)
+    ->middleware(['auth', 'verified'])
+    ->name('users');
+Route::get('users/create', \App\Livewire\Users\ManageForm::class)
+    ->middleware(['auth', 'verified'])
+    ->name('users.create');
+Route::get('users/{user}/edit', \App\Livewire\Users\ManageForm::class)
+    ->middleware(['auth', 'verified'])
+    ->name('users.edit');
 
 require __DIR__.'/auth.php';

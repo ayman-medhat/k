@@ -58,7 +58,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
     .header h1 {
         font-size: 2.5rem;
@@ -105,6 +105,9 @@
         padding: 2rem;
         box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         overflow-x: auto;
+    }
+    @media (max-width: 640px) {
+        .glass-panel { padding: 1rem; }
     }
     .btn-icon {
         background: none;

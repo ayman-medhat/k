@@ -77,19 +77,43 @@
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
     .divider { border: none; border-top: 1px solid var(--crm-divider); margin: 1rem 0; }
     .checkbox-group label { border-radius: 0.5rem; padding: 0.35rem 0.65rem; border: 1px solid var(--crm-input-border); transition: all 0.15s; }
-    .checkbox-group label:has(input:checked) { background: var(--crm-badge-indigo-bg); border-color: var(--crm-input-focus-border); }
-    .checkbox-group label:has(input:checked) span { font-weight: 700; color: var(--crm-input-focus-border); }
+    .checkbox-group label:has(input:checked) { background: transparent; border-color: transparent; }
+    .checkbox-group label:has(input:checked) span { font-weight: 400; color: var(--crm-text); }
     .parent-select-row { display: flex; gap: 0.5rem; align-items: flex-end; }
     .parent-select-row .form-group { flex: 1; margin-bottom: 0; }
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
+        font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;
+    }
+    .btn-success:hover { transform: translateY(-2px); }
+    .parent-creation-banner {
+        background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #f59e0b;
+        border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1.5rem;
+        font-size: 0.9rem; color: #92400e; display: flex; align-items: center; gap: 0.5rem;
+    }
 </style>
 
     <div class="form-card">
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
             <a href="{{ route('contacts') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back</a>
         </div>
-        <h1>{{ $contact ? 'Edit Contact' : 'New Contact' }}</h1>
+        <h1>
+            @if($creatingMotherForStudent)
+                New Mother
+            @else
+                {{ $contact ? 'Edit Contact' : 'New Contact' }}
+            @endif
+        </h1>
 
-        <form wire:submit.prevent="save">
+        @if($creatingMotherForStudent)
+        <div class="parent-creation-banner">
+            <span>⭐</span>
+            <span>You are creating a new <strong>Mother</strong>. After saving, you'll be returned to the Student form.</span>
+        </div>
+        @endif
+
+        <form wire:submit.prevent="{{ $creatingMotherForStudent ? 'saveMotherAndReturn' : 'save' }}">
             <div class="grid-2">
                 <div class="form-group">
                     <label>English Name</label>
@@ -120,9 +144,14 @@
                 <div class="form-group">
                     <label>Categories</label>
                     <div class="checkbox-group" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.25rem;">
-                        @foreach(['Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'] as $cat)
+                        @foreach($this->allowedCategoryOptions as $cat)
                         <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
-                            <input type="checkbox" value="{{ $cat }}" wire:click="toggleCategory('{{ $cat }}')" {{ in_array($cat, $categories) ? 'checked' : '' }} style="width: auto;">
+                            <div style="position: relative; width: 1.1rem; height: 1.1rem; flex-shrink: 0;">
+                                <input type="checkbox" value="{{ $cat }}" wire:click="toggleCategory('{{ $cat }}')" {{ in_array($cat, $categories) ? 'checked' : '' }} style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; margin: 0;">
+                                <div style="width: 100%; height: 100%; border: 2px solid var(--crm-input-border, #d1d5db); border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; background: transparent !important;">
+                                    @if(in_array($cat, $categories)) <span style="font-size: 0.75rem; line-height: 1;">✅</span> @endif
+                                </div>
+                            </div>
                             <span style="font-size: 0.875rem; color: var(--crm-text);">{{ $cat }}</span>
                         </label>
                         @endforeach
@@ -186,71 +215,19 @@
             </div>
             @endif
 
-            @if(in_array('Student', $categories))
+            @if(!$creatingMotherForStudent && in_array('Student', $categories))
             <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">🎓 Assign Grade</div>
-            <div class="form-group">
-                <label>Select Grade</label>
-                <select wire:model="grade_id">
-                    <option value="">-- No Grade Selected --</option>
-                    @foreach($this->availableGrades as $g)
-                        <option value="{{ $g->id }}">{{ $g->name }} ({{ $g->name_ar }})</option>
-                    @endforeach
-                </select>
-                @error('grade_id') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            @endif
-
-            @if(in_array('Student', $categories) && $grade_id)
-            @php $secondLangOpts = $this->secondLanguageOptions; @endphp
-            @if($secondLangOpts->count())
-            <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">🌐 Choose Second Language</div>
-            <div class="form-group">
-                <label>Select Language</label>
-                <select wire:model="second_language_subject_id">
-                    <option value="">-- Choose Language --</option>
-                    @foreach($secondLangOpts as $lang)
-                        <option value="{{ $lang->id }}">{{ $lang->name }} ({{ $lang->name_ar }})</option>
-                    @endforeach
-                </select>
-                @error('second_language_subject_id') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            @endif
-            @endif
-
-            @if(in_array('Student', $categories))
-            <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">👨 Assign Father</div>
-            <div class="form-group">
-                <label>Select Father</label>
-                <select wire:model="parent_id">
-                    <option value="">-- No Father Selected --</option>
-                    @foreach($this->availableParents as $p)
-                        <option value="{{ $p->id }}">{{ $p->nameEn }} ({{ $p->nameAr }})</option>
-                    @endforeach
-                </select>
-                @error('parent_id') <span class="error">{{ $message }}</span> @enderror
-            </div>
-
-            <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">👩 Assign Mother</div>
-            <div class="form-group">
-                <label>Select Mother</label>
-                <select wire:model="mother_id">
-                    <option value="">-- No Mother Selected --</option>
-                    @foreach($this->availableMothers as $m)
-                        <option value="{{ $m->id }}">{{ $m->nameEn }} ({{ $m->nameAr }})</option>
-                    @endforeach
-                </select>
-                @error('mother_id') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            <hr class="divider">
+            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">📋 Student academic info is managed in the <a href="{{ route('students') }}" wire:navigate style="color: var(--crm-input-focus-border);">Students</a> section.</div>
             @endif
 
             <div class="actions">
+                @if($creatingMotherForStudent)
+                    <button type="button" wire:click="cancelMotherCreation" class="btn-secondary">← Back to Student</button>
+                    <button type="submit" class="btn-success">Save Mother & Return</button>
+                @else
                 <a href="{{ route('contacts') }}" wire:navigate class="btn-secondary">Cancel</a>
                 <button type="submit" class="btn-primary">Save Contact</button>
+                @endif
             </div>
         </form>
     </div>

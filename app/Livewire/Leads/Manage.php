@@ -7,6 +7,7 @@ use App\Models\Lead;
 use App\Models\Stage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -17,6 +18,7 @@ class Manage extends Component
 
     public $viewMode = 'list';
 
+    #[Url(as: 'categories')]
     public $filterCategory = 'All';
     public $filterStage = '';
 
@@ -90,13 +92,50 @@ class Manage extends Component
 
     public function render()
     {
+        $user = auth()->user();
+
+        $allowedCategories = match($user->role) {
+            'hr' => ['Employee'],
+            'student_affairs' => ['Student', 'Parent'],
+            'academic' => ['Student'],
+            'control' => ['Student'],
+            default => null,
+        };
+
+        $validCategories = $allowedCategories !== null
+            ? array_merge(['All'], $allowedCategories)
+            : ['All', 'Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'];
+
+        if ($this->filterCategory !== 'All' && $allowedCategories !== null && !in_array($this->filterCategory, $allowedCategories)) {
+            $this->filterCategory = 'All';
+        }
+
         $categoryCounts = Lead::selectRaw("jsonb_array_elements_text(categories) as cat, count(*) as total")
+            ->when($allowedCategories, fn ($q) => $q->where(function ($q) use ($allowedCategories) {
+                foreach ($allowedCategories as $cat) {
+                    $q->orWhereJsonContains('categories', $cat);
+                }
+            }))
             ->groupBy('cat')
             ->pluck('total', 'cat')
             ->toArray();
 
         $leadsQuery = Lead::with('parent', 'mother', 'grade', 'children')
-            ->when($this->filterCategory !== 'All', fn ($q) => $q->whereJsonContains('categories', $this->filterCategory))
+            ->when($allowedCategories, function ($q) use ($allowedCategories) {
+                $q->where(function ($q) use ($allowedCategories) {
+                    foreach ($allowedCategories as $cat) {
+                        $q->orWhereJsonContains('categories', $cat);
+                    }
+                });
+            })
+            ->when($this->filterCategory !== 'All', function ($q) {
+                $categories = array_map('trim', explode(',', $this->filterCategory));
+                $q->where(function ($q) use ($categories) {
+                    foreach ($categories as $cat) {
+                        $q->orWhereJsonContains('categories', $cat);
+                    }
+                });
+            })
             ->when($this->filterCategory === 'Student' && $this->filterStage !== '', function ($q) {
                 $q->whereHas('grade.stages', fn ($sq) => $sq->where('stages.id', $this->filterStage));
             })
@@ -105,7 +144,14 @@ class Manage extends Component
         return view('livewire.leads.manage', [
             'leads' => $leadsQuery->paginate(10),
             'categoryCounts' => $categoryCounts,
-            'totalCount' => Lead::count(),
+            'totalCount' => Lead::when($allowedCategories, function ($q) use ($allowedCategories) {
+                $q->where(function ($q) use ($allowedCategories) {
+                    foreach ($allowedCategories as $cat) {
+                        $q->orWhereJsonContains('categories', $cat);
+                    }
+                });
+            })->count(),
+            'allowedCategories' => $validCategories,
         ]);
     }
 }

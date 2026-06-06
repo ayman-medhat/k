@@ -9,7 +9,6 @@ class Contact extends Model
     protected $fillable = [
         'nameEn', 'nameAr', 'email', 'phone', 'nationality', 'religion', 'gender', 'categories',
         'national_id', 'passport_no', 'birth_date', 'status', 'source', 'notes', 'parent_id', 'mother_id',
-        'grade_id', 'second_language_subject_id'
     ];
 
     protected function casts(): array
@@ -40,26 +39,22 @@ class Contact extends Model
         return $this->belongsTo(Contact::class, 'mother_id');
     }
 
-    public function grade()
+    public function student()
     {
-        return $this->belongsTo(Grade::class);
-    }
-
-    public function secondLanguageSubject()
-    {
-        return $this->belongsTo(Subject::class, 'second_language_subject_id');
+        return $this->hasOne(Student::class, 'contact_id');
     }
 
     public function assignedSubjects()
     {
-        if (! $this->grade) return collect();
+        $student = $this->student;
+        if (!$student || !$student->grade) return collect();
 
-        $subjects = $this->grade->subjectsForReligion($this->religion);
+        $subjects = $student->grade->subjectsForReligion($this->religion);
 
-        if ($this->secondLanguageSubject) {
-            $subjects = $subjects->map(function ($subject) {
+        if ($student->secondLanguage) {
+            $subjects = $subjects->map(function ($subject) use ($student) {
                 if ($subject->name === 'Second Language' && !$subject->parent_id) {
-                    return $this->secondLanguageSubject;
+                    return $student->secondLanguage;
                 }
                 return $subject;
             });

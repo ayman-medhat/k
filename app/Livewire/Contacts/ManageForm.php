@@ -2,9 +2,7 @@
 
 namespace App\Livewire\Contacts;
 
-use App\Models\Grade;
 use App\Models\Contact;
-use App\Models\Subject;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Computed;
@@ -27,8 +25,9 @@ class ManageForm extends Component
     public $categories = ['Parent'];
     public $parent_id = null;
     public $mother_id = null;
-    public $grade_id = null;
-    public $second_language_subject_id = null;
+
+    public $creatingMotherForStudent = false;
+    public $savedStudentState = [];
 
     public function mount(?Contact $contact = null)
     {
@@ -48,8 +47,6 @@ class ManageForm extends Component
             $this->categories = $contact->categories ?? ['Parent'];
             $this->parent_id = $contact->parent_id;
             $this->mother_id = $contact->mother_id;
-            $this->grade_id = $contact->grade_id;
-            $this->second_language_subject_id = $contact->second_language_subject_id;
         }
     }
 
@@ -67,11 +64,9 @@ class ManageForm extends Component
             'passport_no' => $this->nationality !== 'Egyptian' ? 'required|string' : 'nullable',
             'status' => 'required|string',
             'categories' => 'required|array|min:1',
-            'categories.*' => 'string|in:Parent,Student,Employee,Supplier,Partner,Owner',
+            'categories.*' => 'string|in:' . implode(',', $this->allowedCategoryOptions()),
             'parent_id' => 'nullable|exists:contacts,id',
             'mother_id' => 'nullable|exists:contacts,id',
-            'grade_id' => 'nullable|exists:grades,id',
-            'second_language_subject_id' => 'nullable|exists:subjects,id',
         ];
     }
 
@@ -79,6 +74,10 @@ class ManageForm extends Component
     {
         if (in_array($category, $this->categories)) {
             $this->categories = array_values(array_diff($this->categories, [$category]));
+        } elseif ($category === 'Student') {
+            $this->categories = ['Student'];
+        } elseif (in_array('Student', $this->categories)) {
+            return;
         } else {
             $this->categories[] = $category;
         }
@@ -86,6 +85,122 @@ class ManageForm extends Component
         if (empty($this->categories)) {
             $this->categories = ['Parent'];
         }
+    }
+
+    #[Computed]
+    public function allowedCategoryOptions(): array
+    {
+        $user = auth()->user();
+        return match($user->role) {
+            'hr' => ['Employee'],
+            'student_affairs' => ['Parent', 'Student'],
+            'academic' => ['Student', 'Supplier', 'Partner', 'Owner'],
+            'control' => ['Student'],
+            default => ['Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'],
+        };
+    }
+
+    public function startCreatingMother()
+    {
+        $this->savedStudentState = [
+            'nameEn' => $this->nameEn,
+            'nameAr' => $this->nameAr,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'nationality' => $this->nationality,
+            'religion' => $this->religion,
+            'gender' => $this->gender,
+            'national_id' => $this->national_id,
+            'passport_no' => $this->passport_no,
+            'status' => $this->status,
+            'categories' => $this->categories,
+            'parent_id' => $this->parent_id,
+        ];
+
+        $this->nameEn = '';
+        $this->nameAr = '';
+        $this->email = '';
+        $this->phone = '';
+        $this->nationality = 'Egyptian';
+        $this->national_id = '';
+        $this->passport_no = '';
+        $this->status = 'Active';
+        $this->parent_id = null;
+        $this->categories = ['Parent'];
+        $this->gender = 'Female';
+        $this->resetValidation();
+
+        $this->creatingMotherForStudent = true;
+    }
+
+    public function saveMotherAndReturn()
+    {
+        $this->validate([
+            'nameEn' => 'required|string|max:255',
+            'nameAr' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string',
+            'nationality' => 'required|string',
+            'national_id' => $this->nationality === 'Egyptian' ? 'required|digits:14|unique:contacts,national_id' : 'nullable',
+            'passport_no' => $this->nationality !== 'Egyptian' ? 'required|string' : 'nullable',
+        ]);
+
+        $data = [
+            'nameEn' => $this->nameEn,
+            'nameAr' => $this->nameAr,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'nationality' => $this->nationality,
+            'gender' => 'Female',
+            'status' => $this->status,
+            'categories' => ['Parent'],
+        ];
+        if ($this->nationality === 'Egyptian') {
+            $data['national_id'] = $this->national_id;
+        } else {
+            $data['passport_no'] = $this->passport_no;
+        }
+
+        $newMother = Contact::create($data);
+
+        $saved = $this->savedStudentState;
+        $this->nameEn = $saved['nameEn'];
+        $this->nameAr = $saved['nameAr'];
+        $this->email = $saved['email'];
+        $this->phone = $saved['phone'];
+        $this->nationality = $saved['nationality'];
+        $this->religion = $saved['religion'];
+        $this->gender = $saved['gender'];
+        $this->national_id = $saved['national_id'];
+        $this->passport_no = $saved['passport_no'];
+        $this->status = $saved['status'];
+        $this->categories = $saved['categories'];
+        $this->parent_id = $saved['parent_id'];
+        $this->mother_id = $newMother->id;
+        $this->savedStudentState = [];
+        $this->creatingMotherForStudent = false;
+        $this->resetValidation();
+        unset($this->availableMothers);
+    }
+
+    public function cancelMotherCreation()
+    {
+        $saved = $this->savedStudentState;
+        $this->nameEn = $saved['nameEn'];
+        $this->nameAr = $saved['nameAr'];
+        $this->email = $saved['email'];
+        $this->phone = $saved['phone'];
+        $this->nationality = $saved['nationality'];
+        $this->religion = $saved['religion'];
+        $this->gender = $saved['gender'];
+        $this->national_id = $saved['national_id'];
+        $this->passport_no = $saved['passport_no'];
+        $this->status = $saved['status'];
+        $this->categories = $saved['categories'];
+        $this->parent_id = $saved['parent_id'];
+        $this->savedStudentState = [];
+        $this->creatingMotherForStudent = false;
+        $this->resetValidation();
     }
 
     #[Computed]
@@ -103,34 +218,6 @@ class ManageForm extends Component
             ->where('gender', 'Female')
             ->orderBy('nameEn')
             ->get(['id', 'nameEn', 'nameAr']);
-    }
-
-    #[Computed]
-    public function availableGrades()
-    {
-        return Grade::orderBy('level_order')
-            ->get(['id', 'name', 'name_ar']);
-    }
-
-    #[Computed]
-    public function secondLanguageOptions()
-    {
-        if (! $this->grade_id) return collect();
-
-        $secondLang = Subject::where('name', 'Second Language')
-            ->whereNull('parent_id')
-            ->first();
-
-        if (! $secondLang) return collect();
-
-        return Subject::where('parent_id', $secondLang->id)
-            ->orderBy('name')
-            ->get(['id', 'name', 'name_ar']);
-    }
-
-    public function updatedGradeId()
-    {
-        $this->second_language_subject_id = null;
     }
 
     public function save()
@@ -151,8 +238,6 @@ class ManageForm extends Component
             'categories' => $this->categories,
             'parent_id' => $isStudent ? $this->parent_id : null,
             'mother_id' => $isStudent ? $this->mother_id : null,
-            'grade_id' => $isStudent ? $this->grade_id : null,
-            'second_language_subject_id' => $isStudent ? $this->second_language_subject_id : null,
         ];
 
         if ($this->nationality === 'Egyptian') {

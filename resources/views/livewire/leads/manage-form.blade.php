@@ -97,8 +97,8 @@
     .parent-select-row { display: flex; gap: 0.5rem; align-items: flex-end; }
     .parent-select-row .form-group { flex: 1; margin-bottom: 0; }
     .checkbox-group label { border-radius: 0.5rem; padding: 0.35rem 0.65rem; border: 1px solid var(--crm-input-border); transition: all 0.15s; }
-    .checkbox-group label:has(input:checked) { background: var(--crm-badge-indigo-bg); border-color: var(--crm-input-focus-border); }
-    .checkbox-group label:has(input:checked) span { font-weight: 700; color: var(--crm-input-focus-border); }
+    .checkbox-group label:has(input:checked) { background: transparent; border-color: transparent; }
+    .checkbox-group label:has(input:checked) span { font-weight: 400; color: var(--crm-text); }
     .parent-creation-banner {
         background: linear-gradient(135deg, #fffbeb, #fef3c7);
         border: 1px solid #fde68a; border-radius: 0.75rem;
@@ -114,7 +114,9 @@
         </div>
         <h1>
             @if($creatingParentForStudent)
-                New Parent
+                New Father
+            @elseif($creatingMotherForStudent)
+                New Mother
             @elseif($lead)
                 Edit Lead
             @else
@@ -125,7 +127,12 @@
         @if($creatingParentForStudent)
         <div class="parent-creation-banner">
             <span>⭐</span>
-            <span>You are creating a <strong>new Parent</strong>. After saving, you'll be returned to the Student form.</span>
+            <span>You are creating a new <strong>Father</strong>. After saving, you'll be returned to the Student form.</span>
+        </div>
+        @elseif($creatingMotherForStudent)
+        <div class="parent-creation-banner">
+            <span>⭐</span>
+            <span>You are creating a new <strong>Mother</strong>. After saving, you'll be returned to the Student form.</span>
         </div>
         @endif
 
@@ -143,14 +150,11 @@
                 <div><strong>Email:</strong> {{ $l->email ?? 'N/A' }}</div>
                 <div><strong>Phone:</strong> {{ $l->phone ?? 'N/A' }}</div>
                 <div><strong>Categories:</strong> {{ implode(', ', $l->categories ?? []) }}</div>
-                <div><strong>Nationality:</strong> {{ $l->nationality }}</div>
                 <div><strong>Status:</strong> {{ $l->status }}</div>
                 <div><strong>Religion:</strong> {{ $l->religion ?? 'N/A' }}</div>
                 <div><strong>Gender:</strong> {{ $l->gender ?? 'N/A' }}</div>
-                <div><strong>Grade:</strong> {{ $l->grade?->name ?? 'N/A' }}</div>
-                <div><strong>Father:</strong> {{ $l->parent?->nameEn ?? 'N/A' }}</div>
-                <div><strong>Mother:</strong> {{ $l->mother?->nameEn ?? 'N/A' }}</div>
-                <div><strong>National ID / Passport:</strong> {{ $l->nationality === 'Egyptian' ? $l->national_id : ($l->passport_no ?? 'N/A') }}</div>
+                <div><strong>Birth Date:</strong> {{ $l->birth_date?->format('Y-m-d') ?? 'N/A' }}</div>
+                <div><strong>Age at 1st October:</strong> {{ $l->birth_date ? \App\Models\Student::formatAgeAtOctober($l->birth_date->format('Y-m-d')) : 'N/A' }}</div>
             </div>
             <div class="actions" style="margin-top: 1.5rem;">
                 <a href="{{ route('leads') }}" wire:navigate class="btn-secondary">← Back to Leads</a>
@@ -158,7 +162,7 @@
         </div>
         @else
 
-        <form wire:submit.prevent="{{ $creatingParentForStudent ? 'saveParentAndReturn' : 'save' }}">
+        <form wire:submit.prevent="{{ $creatingParentForStudent ? 'saveParentAndReturn' : ($creatingMotherForStudent ? 'saveMotherAndReturn' : 'save') }}">
             <div class="grid-2">
                 <div class="form-group">
                     <label>English Name</label>
@@ -186,28 +190,23 @@
             </div>
 
             @if(!$creatingParentForStudent)
-            <div class="grid-3">
+            <div class="grid-2">
                 <div class="form-group">
                     <label>Categories</label>
                     <div class="checkbox-group" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.25rem;">
-                        @foreach(['Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'] as $cat)
+                        @foreach($this->allowedCategoryOptions as $cat)
                         <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
-                            <input type="checkbox" value="{{ $cat }}" wire:click="toggleCategory('{{ $cat }}')" {{ in_array($cat, $categories) ? 'checked' : '' }} style="width: auto;">
+                            <div style="position: relative; width: 1.1rem; height: 1.1rem; flex-shrink: 0;">
+                                <input type="checkbox" value="{{ $cat }}" wire:click="toggleCategory('{{ $cat }}')" {{ in_array($cat, $categories) ? 'checked' : '' }} style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; margin: 0;">
+                                <div style="width: 100%; height: 100%; border: 2px solid var(--crm-input-border, #d1d5db); border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; background: transparent !important;">
+                                    @if(in_array($cat, $categories)) <span style="font-size: 0.75rem; line-height: 1;">✅</span> @endif
+                                </div>
+                            </div>
                             <span style="font-size: 0.875rem; color: var(--crm-text);">{{ $cat }}</span>
                         </label>
                         @endforeach
                     </div>
                     @error('categories') <span class="error">{{ $message }}</span> @enderror
-                </div>
-                <div class="form-group">
-                    <label>Nationality</label>
-                    <select wire:model.live="nationality">
-                        <option value="Egyptian">Egyptian</option>
-                        <option value="American">American</option>
-                        <option value="British">British</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    @error('nationality') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
                     <label>Status</label>
@@ -243,16 +242,6 @@
                 </div>
             </div>
             @else
-            <div class="form-group">
-                <label>Nationality</label>
-                <select wire:model.live="nationality">
-                    <option value="Egyptian">Egyptian</option>
-                    <option value="American">American</option>
-                    <option value="British">British</option>
-                    <option value="Other">Other</option>
-                </select>
-                @error('nationality') <span class="error">{{ $message }}</span> @enderror
-            </div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Religion</label>
@@ -275,92 +264,30 @@
             </div>
             @endif
 
-            @if($nationality === 'Egyptian')
-            <div class="form-group">
-                <label>National ID (14 Digits)</label>
-                <input type="text" wire:model="national_id" placeholder="29001011234567">
-                @error('national_id') <span class="error">{{ $message }}</span> @enderror
-                <small style="color: var(--crm-text-muted); font-size: 0.75rem;">Age and birth date will be calculated automatically.</small>
-            </div>
-            @else
-            <div class="form-group">
-                <label>Passport Number</label>
-                <input type="text" wire:model="passport_no" placeholder="A1234567">
-                @error('passport_no') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            @endif
-
-            @if(!$creatingParentForStudent && in_array('Student', $categories))
-            <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">🎓 Assign Grade</div>
-            <div class="form-group">
-                <label>Select Grade</label>
-                <select wire:model="grade_id">
-                    <option value="">-- No Grade Selected --</option>
-                    @foreach($this->availableGrades as $g)
-                        <option value="{{ $g->id }}">{{ $g->name }} ({{ $g->name_ar }})</option>
-                    @endforeach
-                </select>
-                @error('grade_id') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            @endif
-
-            @if(!$creatingParentForStudent && in_array('Student', $categories) && $grade_id)
-            @php $secondLangOpts = $this->secondLanguageOptions; @endphp
-            @if($secondLangOpts->count())
-            <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">🌐 Choose Second Language</div>
-            <div class="form-group">
-                <label>Select Language</label>
-                <select wire:model="second_language_subject_id">
-                    <option value="">-- Choose Language --</option>
-                    @foreach($secondLangOpts as $lang)
-                        <option value="{{ $lang->id }}">{{ $lang->name }} ({{ $lang->name_ar }})</option>
-                    @endforeach
-                </select>
-                @error('second_language_subject_id') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            @endif
-            @endif
-
-            @if(!$creatingParentForStudent && in_array('Student', $categories))
-            <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">👨 Assign Father</div>
-            <div class="parent-select-row">
+            <div class="grid-2">
                 <div class="form-group">
-                    <label>Select Father</label>
-                    <select wire:model="parent_id">
-                        <option value="">-- No Father Selected --</option>
-                        @foreach($this->availableParents as $p)
-                            <option value="{{ $p->id }}">{{ $p->nameEn }} ({{ $p->nameAr }})</option>
-                        @endforeach
-                    </select>
-                    @error('parent_id') <span class="error">{{ $message }}</span> @enderror
+                    <label>Birth Date</label>
+                    <input type="date" wire:model.live="birth_date">
+                    @error('birth_date') <span class="error">{{ $message }}</span> @enderror
                 </div>
-                <button type="button" wire:click="startCreatingParent" class="btn-success" style="margin-bottom: 1.25rem;">
-                    + New Father
-                </button>
+                <div class="form-group">
+                    <label>Age at 1st October</label>
+                    <input type="text" readonly value="{{ $birth_date ? ($ageFormatted ?: 'Auto-calculated') : '—' }}">
+                </div>
             </div>
 
+            @if(!$creatingParentForStudent && !$creatingMotherForStudent && in_array('Student', $categories))
             <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">👩 Assign Mother</div>
-            <div class="form-group">
-                <label>Select Mother</label>
-                <select wire:model="mother_id">
-                    <option value="">-- No Mother Selected --</option>
-                    @foreach($this->availableMothers as $m)
-                        <option value="{{ $m->id }}">{{ $m->nameEn }} ({{ $m->nameAr }})</option>
-                    @endforeach
-                </select>
-                @error('mother_id') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            <hr class="divider">
+            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">📋 Student academic info is managed in the <a href="{{ route('students') }}" wire:navigate style="color: var(--crm-input-focus-border);">Students</a> section.</div>
             @endif
 
             <div class="actions">
                 @if($creatingParentForStudent)
                     <button type="button" wire:click="cancelParentCreation" class="btn-secondary">← Back to Student</button>
-                    <button type="submit" class="btn-success">Save Parent & Return</button>
+                    <button type="submit" class="btn-success">Save Father & Return</button>
+                @elseif($creatingMotherForStudent)
+                    <button type="button" wire:click="cancelParentCreation" class="btn-secondary">← Back to Student</button>
+                    <button type="submit" class="btn-success">Save Mother & Return</button>
                 @else
                     <a href="{{ route('leads') }}" wire:navigate class="btn-secondary">Cancel</a>
                     <button type="submit" class="btn-primary">Save Lead</button>

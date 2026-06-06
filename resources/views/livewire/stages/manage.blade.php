@@ -54,7 +54,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
     .header h1 {
         font-size: 2.5rem;
@@ -102,14 +102,31 @@
         box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         overflow-x: auto;
     }
+    @media (max-width: 640px) {
+        .glass-panel { padding: 1rem; }
+    }
     table {
         width: 100%;
         border-collapse: collapse;
     }
     th, td {
-        padding: 1rem;
+        padding: 0.5rem 0.75rem;
         text-align: left;
-        border-bottom: 1px solid var(--crm-border);
+        border-bottom: 1px solid var(--crm-divider-dashed);
+    }
+    @media (max-width: 640px) {
+        th, td { padding: 0.35rem 0.5rem; }
+    }
+    th {
+        font-weight: 600;
+        color: var(--crm-table-head);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    td {
+        color: var(--crm-text);
+        font-size: 0.875rem;
     }
     th {
         font-weight: 600;

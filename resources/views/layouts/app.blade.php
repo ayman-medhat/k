@@ -5,7 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ \App\Models\School::first()?->nameEn ?? config('app.name', 'Laravel') }}</title>
+
+        @php($schoolIcon = \App\Models\School::first()?->logo)
+        @if($schoolIcon)
+        <link rel="icon" type="image/x-icon" href="{{ $schoolIcon }}">
+        <link rel="apple-touch-icon" href="{{ $schoolIcon }}">
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -39,6 +45,7 @@
                 --crm-banner-border: #fde68a;
                 --crm-banner-label: #92400e;
                 --crm-banner-name: #78350f;
+                --crm-dropdown-bg: #ffffff;
                 --crm-btn-secondary-bg: #f3f4f6;
                 --crm-btn-secondary-hover: #e5e7eb;
                 --crm-btn-secondary-text: #374151;
@@ -76,6 +83,7 @@
                 --crm-banner-border: #92400e;
                 --crm-banner-label: #fef3c7;
                 --crm-banner-name: #fde68a;
+                --crm-dropdown-bg: #1e293b;
                 --crm-btn-secondary-bg: #334155;
                 --crm-btn-secondary-hover: #475569;
                 --crm-btn-secondary-text: #e2e8f0;
@@ -113,6 +121,7 @@
                 --crm-banner-border: #e2d1a5;
                 --crm-banner-label: #5c3d1c;
                 --crm-banner-name: #3b2a10;
+                --crm-dropdown-bg: #ffffff;
                 --crm-btn-secondary-bg: #ece2d0;
                 --crm-btn-secondary-hover: #dfd1b5;
                 --crm-btn-secondary-text: #3b2f25;
@@ -150,6 +159,7 @@
                 --crm-banner-border: #a07845;
                 --crm-banner-label: #fce8c8;
                 --crm-banner-name: #ffe0a0;
+                --crm-dropdown-bg: #2a1f16;
                 --crm-btn-secondary-bg: #3e2e1e;
                 --crm-btn-secondary-hover: #54402c;
                 --crm-btn-secondary-text: #f0e4d0;
@@ -166,9 +176,22 @@
             [data-theme="natural"] .crm-container {
                 background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
             }
+            [x-cloak] { display: none !important; }
         </style>
     </head>
-    <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+          x-data="{ transitioning: false }"
+          x-on:livewire:navigating.window="transitioning = true"
+          x-on:livewire:navigated.window="setTimeout(() => transitioning = false, 80)">
+        <!-- Page transition overlay -->
+        <div x-show="transitioning"
+             x-transition:enter="ease-in-out duration-150"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in-out duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             style="position: fixed; inset: 0; z-index: 999999; pointer-events: none; background: var(--crm-bg-from, #f3f4f6);"></div>
         <div class="min-h-screen bg-gray-100">
             <livewire:layout.navigation />
 

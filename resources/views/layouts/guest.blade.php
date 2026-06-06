@@ -5,7 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ \App\Models\School::first()?->nameEn ?? config('app.name', 'Laravel') }}</title>
+
+        @php($schoolIcon = \App\Models\School::first()?->logo)
+        @if($schoolIcon)
+        <link rel="icon" type="image/x-icon" href="{{ $schoolIcon }}">
+        <link rel="apple-touch-icon" href="{{ $schoolIcon }}">
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -18,7 +24,12 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/" wire:navigate>
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    @php($school = \App\Models\School::first())
+                    @if($school && $school->logo)
+                        <img src="{{ $school->logo }}" alt="{{ $school->nameEn }}" style="height: 2.5rem; width: auto; border-radius: 0.375rem;">
+                    @else
+                        <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    @endif
                 </a>
             </div>
 

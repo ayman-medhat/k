@@ -109,7 +109,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
     .header h1 {
         font-size: 2.5rem;
@@ -188,14 +188,20 @@
         box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         overflow-x: auto;
     }
+    @media (max-width: 640px) {
+        .glass-panel { padding: 1rem; }
+    }
     table {
         width: 100%;
         border-collapse: collapse;
     }
     th, td {
-        padding: 1rem;
+        padding: 0.5rem 0.75rem;
         text-align: left;
         border-bottom: 1px solid var(--crm-divider-dashed);
+    }
+    @media (max-width: 640px) {
+        th, td { padding: 0.35rem 0.5rem; }
     }
     th {
         font-weight: 600;
@@ -494,7 +500,7 @@
 
     {{-- Category Filter Tabs --}}
     @php
-        $categories = ['All', 'Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'];
+        $categories = $allowedCategories ?? ['All', 'Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'];
         $catIcons = ['All' => '👥', 'Parent' => '🏠', 'Student' => '🎒', 'Employee' => '💼', 'Supplier' => '📦', 'Partner' => '🤝', 'Owner' => '👑'];
     @endphp
     <div class="category-tabs">
@@ -543,9 +549,7 @@
                     <th>Religion</th>
                     <th>Gender</th>
                     <th>Grade</th>
-                    <th>Nationality</th>
-                    <th>Identification</th>
-                    <th>Birthday & Age</th>
+                    <th>Age at 1st Oct</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -553,14 +557,14 @@
             <tbody>
                 @forelse($leads as $lead)
                 <tr>
-                    <td style="width: 20%; white-space: nowrap;">
+                    <td style="width: 20%; word-break: break-word;">
                         <div style="font-weight: 600; color: var(--crm-text);">{{ $lead->nameEn }}</div>
                         <div style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ $lead->nameAr }}</div>
                         @if($lead->status === 'Accepted')
                         <div style="color: #059669; font-size: 0.75rem; margin-top: 0.25rem; font-weight: 600;">✓ Accepted</div>
                         @endif
                     </td>
-                    <td style="white-space: normal;">
+                    <td>
                         @if(in_array('Student', $lead->categories ?? []))
                             @if($lead->parent)
                             <div style="font-size: 0.8rem; color: #d97706;">👨 {{ $lead->parent->nameEn }}</div>
@@ -596,17 +600,13 @@
                             <span style="color: var(--crm-text-muted); font-size: 0.75rem;">—</span>
                         @endif
                     </td>
-                    <td>{{ $lead->nationality }}</td>
                     <td>
-                        @if($lead->nationality === 'Egyptian')
-                            ID: {{ $lead->national_id }}
+                        @if(in_array('Student', $lead->categories ?? []) && $lead->birth_date)
+                            <div style="font-size: 0.875rem;">{{ \App\Models\Student::formatAgeAtOctober($lead->birth_date->format('Y-m-d')) }}</div>
+                            <div style="color: var(--crm-text-muted); font-size: 0.75rem;">Age at 1st October</div>
                         @else
-                            Passport: {{ $lead->passport_no ?? 'N/A' }}
+                            <span style="color: var(--crm-text-muted); font-size: 0.75rem;">—</span>
                         @endif
-                    </td>
-                    <td>
-                        <div>{{ $lead->birth_date ? $lead->birth_date->format('M d, Y') : 'N/A' }}</div>
-                        <div style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ $lead->age ? $lead->age . ' years old' : '' }}</div>
                     </td>
                     <td><span class="badge">{{ $lead->status }}</span></td>
                     <td>
@@ -677,10 +677,6 @@
                     <span class="card-value">{{ in_array('Student', $lead->categories ?? []) && $lead->grade ? $lead->grade->name : '—' }}</span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">Nationality</span>
-                    <span class="card-value">{{ $lead->nationality }}</span>
-                </div>
-                <div class="card-row">
                     <span class="card-label">Religion</span>
                     <span class="card-value">{{ $lead->religion ?? '—' }}</span>
                 </div>
@@ -689,16 +685,18 @@
                     <span class="card-value">{{ $lead->gender ?? '—' }}</span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">{{ $lead->nationality === 'Egyptian' ? 'National ID' : 'Passport' }}</span>
-                    <span class="card-value">{{ $lead->nationality === 'Egyptian' ? $lead->national_id : ($lead->passport_no ?? 'N/A') }}</span>
-                </div>
-                <div class="card-row">
                     <span class="card-label">Birthday</span>
                     <span class="card-value">{{ $lead->birth_date ? $lead->birth_date->format('M d, Y') : 'N/A' }}</span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">Age</span>
-                    <span class="card-value">{{ $lead->detailed_age ?? 'N/A' }}</span>
+                    <span class="card-label">Age at 1st Oct</span>
+                    <span class="card-value">
+                        @if(in_array('Student', $lead->categories ?? []) && $lead->birth_date)
+                            {{ \App\Models\Student::formatAgeAtOctober($lead->birth_date->format('Y-m-d')) }}
+                        @else
+                            N/A
+                        @endif
+                    </span>
                 </div>
                 @if(in_array('Parent', $lead->categories ?? []) && $lead->children->count() > 1)
                 <div class="card-row">

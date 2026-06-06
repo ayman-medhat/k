@@ -123,9 +123,18 @@ class Lead extends Model
             'categories' => $this->categories,
             'parent_id' => null,
             'mother_id' => null,
-            'grade_id' => $this->grade_id,
-            'second_language_subject_id' => $this->second_language_subject_id,
         ]);
+
+        if (in_array('Student', $this->categories ?? [])) {
+            Student::create([
+                'contact_id' => $contact->id,
+                'grade_id' => $this->grade_id ?? 1,
+                'second_language_id' => $this->second_language_subject_id,
+                'age_at_october' => $this->birth_date
+                    ? Student::calculateAgeAtOctober($this->birth_date->format('Y-m-d'))
+                    : null,
+            ]);
+        }
 
         $this->interactions()->each(function ($interaction) use ($contact) {
             $interaction->update(['contact_id' => $contact->id]);
