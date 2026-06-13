@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'page_title' => 'Students',
+    'new_student' => 'New Student',
+    'edit_student' => 'Edit Student',
+    'add_new' => '+ Add New Student',
+    'no_students' => 'No students found.',
+    'student_id' => 'Student ID',
+    'national_id' => 'National ID',
+    'grade' => 'Grade',
+    'section' => 'Section',
+    'religion' => 'Religion',
+    'gender' => 'Gender',
+    'birth_date' => 'Birth Date',
+    'age' => 'Age',
+    'parent' => 'Parent',
+    'mother' => 'Mother',
+    'phone' => 'Phone',
+    'email' => 'Email',
+    'actions' => 'Actions',
+    'edit' => 'Edit',
+    'delete' => 'Delete',
+    'delete_confirm' => 'Are you sure you want to delete this student?',
+];

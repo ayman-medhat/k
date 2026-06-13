@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'login' => 'Log in',
+    'register' => 'Register',
+    'logout' => 'Log Out',
+    'email' => 'Email',
+    'password' => 'Password',
+    'remember' => 'Remember me',
+    'forgot_password' => 'Forgot your password?',
+    'reset_password' => 'Reset Password',
+    'send_link' => 'Send Password Reset Link',
+    'confirm_password' => 'Confirm Password',
+    'verify_email' => 'Verify Email',
+    'verify_sent' => 'A new verification link has been sent to the email address you provided during registration.',
+    'verify_check' => 'Before proceeding, please check your email for a verification link.',
+    'verify_not' => 'If you did not receive the email',
+    'verify_request' => 'click here to request another',
+    'failed' => 'These credentials do not match our records.',
+    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'name' => 'Name',
+    'already_registered' => 'Already registered?',
+    'reset_link_intro' => 'Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.',
+    'secure_area' => 'This is a secure area of the application. Please confirm your password before continuing.',
+    'thanks_signing' => "Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.",
+    'resend_verification' => 'Resend Verification Email',
+    'confirm_delete' => 'Confirm',
+];

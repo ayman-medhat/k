@@ -7,8 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Lead extends Model
 {
     protected $fillable = [
-        'nameEn', 'nameAr', 'email', 'phone', 'nationality', 'religion', 'gender', 'categories',
-        'national_id', 'passport_no', 'birth_date', 'status', 'source', 'notes', 'parent_id', 'mother_id',
+        'nameEn', 'nameAr', 'email', 'phone',
+        'nationality', 'nationality_ar',
+        'religion', 'religion_ar',
+        'gender', 'gender_ar',
+        'categories',
+        'national_id', 'passport_no', 'birth_date',
+        'status', 'status_ar',
+        'source', 'source_ar',
+        'notes', 'notes_ar',
+        'photo',
+        'parent_id', 'mother_id',
         'grade_id', 'second_language_subject_id'
     ];
 
@@ -123,6 +132,13 @@ class Lead extends Model
             'categories' => $this->categories,
             'parent_id' => null,
             'mother_id' => null,
+            'nationality_ar' => $this->nationality_ar,
+            'religion_ar' => $this->religion_ar,
+            'gender_ar' => $this->gender_ar,
+            'status_ar' => $this->status_ar,
+            'source_ar' => $this->source_ar,
+            'notes_ar' => $this->notes_ar,
+            'photo' => $this->photo,
         ]);
 
         if (in_array('Student', $this->categories ?? [])) {

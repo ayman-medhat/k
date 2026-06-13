@@ -64,7 +64,7 @@
     .crm-container {
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
-        min-height: 100vh; padding: 2rem;
+        min-height: 100vh; padding: 0.75rem 2rem;
     }
     .glass-panel {
         background: var(--crm-panel-bg);
@@ -72,7 +72,7 @@
         -webkit-backdrop-filter: blur(10px);
         border-radius: 1rem;
         border: 1px solid var(--crm-panel-border);
-        padding: 2rem;
+        padding: 0.75rem 2rem;
         box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         overflow-x: auto;
     }
@@ -115,18 +115,21 @@
     .role-hr { background: #dbeafe; color: #1d4ed8; }
     .role-student_affairs { background: #fef3c7; color: #b45309; }
     .role-academic { background: #dcfce7; color: #15803d; }
+    .role-parent { background: #e0e7ff; color: #4338ca; }
+    .role-student { background: #fce7f3; color: #be185d; }
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
+        height: 2.25rem;
     }
     .header h1 {
-        font-size: 2.5rem;
+        font-size: 1.2rem;
         color: var(--crm-text);
         margin: 0;
-        font-weight: 800;
-        letter-spacing: -1px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
     }
     .header-actions {
         display: flex;
@@ -134,7 +137,7 @@
         align-items: center;
     }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
         font-weight: 600; border: none; cursor: pointer;
         box-shadow: 0 4px 6px -1px rgba(99,102,241,0.4);
@@ -149,23 +152,49 @@
     }
     .btn-danger:hover { background: rgba(239,68,68,0.1); }
     .email-text { color: var(--crm-text-muted); font-size: 0.8rem; }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
 </style>
 
     <div class="header">
-        <h1>Users</h1>
+        <h1>{{ __('users.page_title') }}</h1>
         <div class="header-actions">
-            <a href="{{ route('users.create') }}" wire:navigate class="btn-primary">+ New User</a>
+            <a href="{{ route('users.create') }}" wire:navigate class="btn-primary">{{ __('users.add_new') }}</a>
         </div>
     </div>
 
     @if(session('error'))
-    <div style="padding: 1rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 0.75rem; color: #ef4444; margin-bottom: 1rem; font-weight: 500;">
+    <div style="padding: 1rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 0.75rem; color: #ef4444; margin-bottom: 0.75rem; font-weight: 500;">
         {{ session('error') }}
     </div>
     @endif
 
     @if(session()->has('message'))
-    <div style="padding: 1rem; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 0.75rem; color: #059669; margin-bottom: 1rem; font-weight: 500;">
+    <div style="padding: 1rem; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 0.75rem; color: #059669; margin-bottom: 0.75rem; font-weight: 500;">
         {{ session('message') }}
     </div>
     @endif
@@ -174,11 +203,11 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
+                    <th>{{ __('users.name') }}</th>
+                    <th>{{ __('users.email') }}</th>
+                    <th>{{ __('users.role') }}</th>
                     <th>Created</th>
-                    <th>Actions</th>
+                    <th>{{ __('general.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -198,15 +227,15 @@
                     </td>
                     <td style="font-size: 0.8rem; color: var(--crm-text-muted);">{{ $u->created_at->format('M d, Y') }}</td>
                     <td>
-                        <a href="{{ route('users.edit', $u) }}" wire:navigate class="btn-primary" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; box-shadow: none;">Edit</a>
+                        <a href="{{ route('users.edit', $u) }}" wire:navigate class="btn-primary" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; box-shadow: none;">{{ __('general.edit') }}</a>
                         @if($u->id !== auth()->id())
-                        <button wire:click="delete({{ $u->id }})" wire:confirm="Delete user '{{ $u->name }}'?" class="btn-danger">Delete</button>
+                        <button wire:click="delete({{ $u->id }})" wire:confirm="{{ __('users.delete_confirm') }}" class="btn-danger">{{ __('general.delete') }}</button>
                         @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 3rem; color: var(--crm-text-muted);">No users found.</td>
+                    <td colspan="5" style="text-align: center; padding: 3rem; color: var(--crm-text-muted);">{{ __('users.no_users') }}</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -214,7 +243,7 @@
     </div>
 
     @if($users->hasPages())
-    <div style="margin-top: 1.5rem;">
+    <div style="margin-top: 0.75rem;">
         {{ $users->links() }}
     </div>
     @endif

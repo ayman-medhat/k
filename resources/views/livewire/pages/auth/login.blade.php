@@ -20,7 +20,11 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $defaultRoute = auth()->user()->isParent()
+            ? route('parent.dashboard', absolute: false)
+            : route('dashboard', absolute: false);
+
+        $this->redirectIntended(default: $defaultRoute, navigate: true);
     }
 }; ?>
 
@@ -31,14 +35,14 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="login">
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
+            <x-input-label for="email" :value="__('auth.email')" />
             <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 
         <!-- Password -->
         <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <x-input-label for="password" :value="__('auth.password')" />
 
             <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full"
                             type="password"
@@ -52,19 +56,43 @@ new #[Layout('layouts.guest')] class extends Component
         <div class="block mt-4">
             <label for="remember" class="inline-flex items-center">
                 <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                <span class="ms-2 text-sm text-gray-600">{{ __('auth.remember') }}</span>
             </label>
         </div>
 
         <div class="flex items-center justify-end mt-4">
+            <!-- Theme & Dark Mode Toggles -->
+            <div style="display: flex; gap: 0.25rem; margin-right: auto;" class="theme-toggles">
+                <button @click="theme = theme === 'natural' ? 'default' : 'natural'; localStorage.setItem('theme', theme); document.documentElement.setAttribute('data-theme', theme);"
+                        x-show="theme === 'default'"
+                        style="width: 2rem; height: 2rem; border-radius: 9999px; border: 1px solid var(--crm-border); background: var(--crm-input-bg); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; opacity: 0.55; transition: opacity 0.2s;"
+                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.55'"
+                        title="{{ __('welcome.theme_brown') }}" x-cloak>
+                    🌰
+                </button>
+                <button @click="theme = theme === 'natural' ? 'default' : 'natural'; localStorage.setItem('theme', theme); document.documentElement.setAttribute('data-theme', theme);"
+                        x-show="theme === 'natural'"
+                        style="width: 2rem; height: 2rem; border-radius: 9999px; border: 1px solid var(--crm-border); background: var(--crm-input-bg); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; opacity: 0.55; transition: opacity 0.2s;"
+                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.55'"
+                        title="{{ __('welcome.theme_default') }}" x-cloak>
+                    🎨
+                </button>
+                <button @click="darkMode = !darkMode"
+                        style="width: 2rem; height: 2rem; border-radius: 9999px; border: 1px solid var(--crm-border); background: var(--crm-input-bg); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; opacity: 0.55; transition: opacity 0.2s;"
+                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.55'"
+                        title="{{ __('welcome.dark_mode') }}">
+                    <span x-show="!darkMode">🌙</span>
+                    <span x-show="darkMode" x-cloak>☀️</span>
+                </button>
+            </div>
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
+                    {{ __('auth.forgot_password') }}
                 </a>
             @endif
 
             <x-primary-button class="ms-3">
-                {{ __('Log in') }}
+                {{ __('auth.login') }}
             </x-primary-button>
         </div>
     </form>

@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val); })" :class="{ 'dark': darkMode }">
+{{-- ============================================================
+     Main CRM Layout
+     Provides the app shell: nav, theme CSS variables, dark mode
+     support via Alpine.js, and a <main> slot for page content
+     ============================================================ --}}
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val); })" :class="{ 'dark': darkMode }">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -58,6 +63,14 @@
                 --crm-pill-bg: #e0e7ff;
                 --crm-pill-text: #4338ca;
                 --crm-empty-bg: rgba(255,255,255,0.7);
+                --crm-btn-primary-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+                --crm-btn-primary-hover: #4f46e5;
+                --crm-btn-success-bg: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                --crm-btn-success-hover: #059669;
+                --crm-btn-danger-text: #dc2626;
+                --crm-btn-danger-border: #fca5a5;
+                --crm-btn-edit-text: #2563eb;
+                --crm-btn-edit-border: #93c5fd;
             }
             .dark {
                 --crm-bg-from: #0f172a;
@@ -134,6 +147,14 @@
                 --crm-pill-bg: #f0e3c6;
                 --crm-pill-text: #5c3d1c;
                 --crm-empty-bg: rgba(255,250,240,0.7);
+                --crm-btn-primary-bg: linear-gradient(135deg, #d4a96a 0%, #b8894a 100%);
+                --crm-btn-primary-hover: #b8894a;
+                --crm-btn-success-bg: linear-gradient(135deg, #8a9e6a 0%, #6d7e52 100%);
+                --crm-btn-success-hover: #6d7e52;
+                --crm-btn-danger-text: #b85a4a;
+                --crm-btn-danger-border: #d49585;
+                --crm-btn-edit-text: #7a6a4a;
+                --crm-btn-edit-border: #c8b895;
             }
             .dark[data-theme="natural"] {
                 --crm-bg-from: #1c1510;
@@ -177,6 +198,8 @@
                 background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
             }
             [x-cloak] { display: none !important; }
+
+
         </style>
     </head>
     <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
@@ -195,19 +218,11 @@
         <div class="min-h-screen bg-gray-100">
             <livewire:layout.navigation />
 
-            <!-- Page Heading -->
-            @if (isset($header))
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endif
-
             <!-- Page Content -->
             <main>
                 {{ $slot }}
             </main>
         </div>
+
     </body>
 </html>

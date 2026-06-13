@@ -48,23 +48,24 @@
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
         min-height: 100vh;
-        padding: 2rem;
+        padding: 0.75rem 2rem;
     }
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
+        height: 2.25rem;
     }
     .header h1 {
-        font-size: 2.5rem;
+        font-size: 1.2rem;
         color: var(--crm-text);
         margin: 0;
-        font-weight: 800;
-        letter-spacing: -1px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
     }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white;
         padding: 0.75rem 1.5rem;
         border-radius: 9999px;
@@ -98,7 +99,7 @@
         -webkit-backdrop-filter: blur(10px);
         border-radius: 1rem;
         border: 1px solid var(--crm-panel-border);
-        padding: 2rem;
+        padding: 0.75rem 2rem;
         box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         overflow-x: auto;
     }
@@ -186,6 +187,9 @@
         font-weight: 600;
         color: var(--crm-text-muted);
         cursor: pointer;
+        height: 2.25rem;
+        display: inline-flex;
+        align-items: center;
         transition: all 0.2s;
         font-size: 0.875rem;
     }
@@ -217,7 +221,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
     .card-title {
         font-weight: 600;
@@ -227,15 +231,15 @@
     .card-subtitle {
         color: var(--crm-text-muted);
         font-size: 0.875rem;
-        margin-top: 0.25rem;
+        margin-top: 0.75rem;
     }
     .card-body {
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
     }
     .card-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         font-size: 0.875rem;
         border-bottom: 1px dashed var(--crm-divider-dashed);
         padding-bottom: 0.25rem;
@@ -268,22 +272,48 @@
         background: var(--crm-badge-indigo-bg, #e0e7ff);
         color: var(--crm-badge-indigo-text, #4338ca);
     }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
 </style>
 
     <div class="header">
-        <h1>Stages</h1>
+        <h1>{{ __('stages.page_title') }}</h1>
         <div style="display: flex; align-items: center;">
             <div class="toggle-group">
                 <button wire:click="$set('viewMode', 'list')" class="toggle-btn {{ $viewMode === 'list' ? 'active' : '' }}">
                     <svg style="width: 1rem; height: 1rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                    List
+                    {{ __('general.list') }}
                 </button>
                 <button wire:click="$set('viewMode', 'cards')" class="toggle-btn {{ $viewMode === 'cards' ? 'active' : '' }}">
                     <svg style="width: 1rem; height: 1rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    Cards
+                    {{ __('general.cards') }}
                 </button>
             </div>
-            <a href="{{ route('stages.create') }}" wire:navigate class="btn-primary">+ Add Stage</a>
+            <a href="{{ route('stages.create') }}" wire:navigate class="btn-primary">{{ __('stages.add_new') }}</a>
         </div>
     </div>
 
@@ -292,12 +322,12 @@
         <table>
             <thead>
                 <tr>
-                    <th>Order</th>
-                    <th>Name (En)</th>
-                    <th>Name (Ar)</th>
+                    <th>{{ __('stages.level_order') }}</th>
+                    <th>{{ __('general.name_en') }}</th>
+                    <th>{{ __('general.name_ar') }}</th>
                     <th>Description</th>
-                    <th>Grades</th>
-                    <th>Actions</th>
+                    <th>{{ __('grades.page_title') }}</th>
+                    <th>{{ __('general.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -306,19 +336,19 @@
                     <td><span class="order-badge">{{ $stage->level_order }}</span></td>
                     <td style="font-weight: 600;">{{ $stage->name }}</td>
                     <td>{{ $stage->name_ar }}</td>
-                    <td>{{ $stage->description ?? '—' }}</td>
+                    <td>{{ $stage->description ?? __('general.no_data') }}</td>
                     <td>
                         <span class="badge">{{ $stage->grades_count }}</span>
                     </td>
                     <td>
-                        <a href="{{ route('stages.edit', $stage) }}" wire:navigate class="btn-icon">Edit</a>
-                        <button wire:click="delete({{ $stage->id }})" wire:confirm="Delete this stage?" class="btn-icon" style="color: #ef4444; margin-left: 0.5rem;">Delete</button>
+                        <a href="{{ route('stages.edit', $stage) }}" wire:navigate class="btn-icon">{{ __('general.edit') }}</a>
+                        <button wire:click="delete({{ $stage->id }})" wire:confirm="{{ __('stages.delete_confirm') }}" class="btn-icon" style="color: #ef4444; margin-left: 0.5rem;">{{ __('general.delete') }}</button>
                     </td>
                 </tr>
                 @empty
                 <tr>
                     <td colspan="6" class="empty-state">
-                        <p>No stages defined yet.</p>
+                        <p>{{ __('stages.no_stages') }}</p>
                         <p style="font-size: 0.875rem;">Create your first stage to get started.</p>
                     </td>
                 </tr>
@@ -332,26 +362,26 @@
         <div class="card">
             <div class="card-header">
                 <div>
-                    <span class="order-badge" style="margin-bottom: 0.5rem; display: inline-flex;">{{ $stage->level_order }}</span>
-                    <div class="card-title" style="margin-top: 0.5rem;">{{ $stage->name }}</div>
+                    <span class="order-badge" style="margin-bottom: 0.75rem; display: inline-flex;">{{ $stage->level_order }}</span>
+                    <div class="card-title" style="margin-top: 0.75rem;">{{ $stage->name }}</div>
                     <div class="card-subtitle">{{ $stage->name_ar }}</div>
                 </div>
-                <span class="badge">{{ $stage->grades_count }} grades</span>
+                <span class="badge">{{ $stage->grades_count }} {{ __('grades.page_title') }}</span>
             </div>
             <div class="card-body">
                 <div class="card-row">
                     <span class="card-label">Description</span>
-                    <span class="card-value">{{ $stage->description ?? '—' }}</span>
+                    <span class="card-value">{{ $stage->description ?? __('general.no_data') }}</span>
                 </div>
             </div>
             <div class="card-actions">
-                <a href="{{ route('stages.edit', $stage) }}" wire:navigate class="btn-icon">Edit</a>
-                <button wire:click="delete({{ $stage->id }})" wire:confirm="Delete this stage?" class="btn-icon" style="color: #ef4444;">Delete</button>
+                <a href="{{ route('stages.edit', $stage) }}" wire:navigate class="btn-icon">{{ __('general.edit') }}</a>
+                <button wire:click="delete({{ $stage->id }})" wire:confirm="{{ __('stages.delete_confirm') }}" class="btn-icon" style="color: #ef4444;">{{ __('general.delete') }}</button>
             </div>
         </div>
         @empty
         <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--crm-text-muted); background: var(--crm-empty-bg, rgba(255,255,255,0.7)); border-radius: 1rem;">
-            No stages defined yet.
+            {{ __('stages.no_stages') }}
         </div>
         @endforelse
     </div>

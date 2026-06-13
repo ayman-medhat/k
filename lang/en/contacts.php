@@ -1,0 +1,38 @@
+<?php
+
+return [
+    'page_title' => 'Contacts',
+    'import_title' => 'Import Contacts',
+    'new_contact' => 'New Contact',
+    'edit_contact' => 'Edit Contact',
+    'add_new' => '+ Add New Contact',
+    'back_to_contacts' => '← Back to Contacts',
+    'new_mother' => 'New Mother',
+    'creating_mother' => "You are creating a new Mother. After saving, you'll be returned to the Student form.",
+    'save_mother' => 'Save Mother & Return',
+    'save_contact' => 'Save Contact',
+    'no_contacts' => 'No contacts found. Start by adding one!',
+    'restore' => 'Restore',
+    'restore_confirm' => 'Restore this contact to leads?',
+    'delete_confirm' => 'Are you sure you want to delete this contact?',
+    'back_to_student' => '← Back to Student',
+
+    // Import
+    'import_complete' => 'Import Complete',
+    'imported' => 'Imported',
+    'updated' => 'Updated',
+    'skipped' => 'Skipped',
+    'errors' => 'Errors',
+    'import_another' => 'Import Another File',
+    'view_contacts' => 'View Contacts',
+    'drop_file' => 'Click to browse or drop a file here',
+    'file_support' => 'Supports .xlsx, .xls, .csv (max 10MB)',
+    'expected_columns' => 'Expected columns:',
+    'download_template' => 'Download template',
+    'importing' => 'Importing...',
+    'duplicate_records' => 'Duplicate Records Found',
+    'records_exist' => 'record(s) with the same National ID already exist in the system.',
+    'id' => 'ID:',
+    'cancel_import' => 'Cancel Import',
+    'skip_duplicates' => 'Skip Duplicates',
+];

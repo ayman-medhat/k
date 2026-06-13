@@ -27,22 +27,22 @@
     .crm-container {
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
-        min-height: 100vh; padding: 2rem;
+        min-height: 100vh; padding: 0.75rem 2rem;
     }
     .form-card {
         background: var(--crm-panel-bg);
         backdrop-filter: blur(10px);
         border-radius: 1rem; border: 1px solid var(--crm-panel-border);
-        padding: 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
+        padding: 0.75rem 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         max-width: 720px; margin: 0 auto;
     }
     .form-card h1 {
         font-size: 1.75rem; font-weight: 800; color: var(--crm-text);
-        margin-top: 0; margin-bottom: 1.5rem; letter-spacing: -0.5px;
+        margin-top: 0; margin-bottom: 0.75rem; letter-spacing: -0.5px;
     }
-    .form-group { margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 0.75rem; }
     .form-group label {
-        display: block; margin-bottom: 0.5rem;
+        display: block; margin-bottom: 0.75rem;
         font-weight: 500; color: var(--crm-text-muted); font-size: 0.875rem;
     }
     .form-group input, .form-group select {
@@ -56,9 +56,9 @@
         box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
         background: var(--crm-panel-bg);
     }
-    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; display: block; }
+    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.75rem; display: block; }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
         font-weight: 600; border: none; cursor: pointer;
         box-shadow: 0 4px 6px -1px rgba(99,102,241,0.4);
@@ -72,7 +72,7 @@
         text-decoration: none; display: inline-block;
     }
     .btn-secondary:hover { background: var(--crm-btn-secondary-hover); }
-    .actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; }
+    .actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 0.75rem; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
     .divider { border: none; border-top: 1px solid var(--crm-divider); margin: 1rem 0; }
@@ -82,68 +82,129 @@
     .parent-select-row { display: flex; gap: 0.5rem; align-items: flex-end; }
     .parent-select-row .form-group { flex: 1; margin-bottom: 0; }
     .btn-success {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: var(--crm-btn-success-bg);
         color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
         font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;
     }
     .btn-success:hover { transform: translateY(-2px); }
     .parent-creation-banner {
         background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #f59e0b;
-        border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1.5rem;
+        border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem;
         font-size: 0.9rem; color: #92400e; display: flex; align-items: center; gap: 0.5rem;
     }
 </style>
 
     <div class="form-card">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-            <a href="{{ route('contacts') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back</a>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <a href="{{ route('contacts') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ __('general.back') }}</a>
         </div>
         <h1>
             @if($creatingMotherForStudent)
-                New Mother
+                {{ __('contacts.new_mother') }}
             @else
-                {{ $contact ? 'Edit Contact' : 'New Contact' }}
+                {{ $contact ? __('contacts.edit_contact') : __('contacts.new_contact') }}
             @endif
         </h1>
 
         @if($creatingMotherForStudent)
         <div class="parent-creation-banner">
             <span>⭐</span>
-            <span>You are creating a new <strong>Mother</strong>. After saving, you'll be returned to the Student form.</span>
+            <span>{{ __('contacts.creating_mother') }}</span>
         </div>
         @endif
 
         <form wire:submit.prevent="{{ $creatingMotherForStudent ? 'saveMotherAndReturn' : 'save' }}">
             <div class="grid-2">
                 <div class="form-group">
-                    <label>English Name</label>
-                    <input type="text" wire:model.blur="nameEn" placeholder="John Doe">
+                    <label>{{ __('general.name_en') }}</label>
+                    <input type="text" wire:model.blur="nameEn" placeholder="{{ __('general.john_doe_en') }}">
                     @error('nameEn') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Arabic Name</label>
-                    <input type="text" wire:model.blur="nameAr" placeholder="جون دو" dir="rtl">
+                    <label>{{ __('general.name_ar') }}</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" wire:model.blur="nameAr" placeholder="{{ __('general.john_doe_ar') }}" dir="rtl" style="flex: 1;">
+                        <button type="button" wire:click="translateName" class="btn-secondary" style="padding: 0.4rem 0.7rem; font-size: 0.75rem; white-space: nowrap; flex-shrink: 0;" title="Translate Arabic name to Latin letters">ترجمة</button>
+                    </div>
                     @error('nameAr') <span class="error">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label>{{ __('general.photo') }}</label>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    @if($photo && !is_object($photo))
+                        <img src="{{ asset('storage/' . $photo) }}" style="width: 4rem; height: 4rem; border-radius: 50%; object-fit: cover; border: 2px solid var(--crm-border);">
+                    @elseif($photo && is_object($photo))
+                        <img src="{{ $photo->temporaryUrl() }}" style="width: 4rem; height: 4rem; border-radius: 50%; object-fit: cover; border: 2px solid var(--crm-border);">
+                    @endif
+                    <input type="file" wire:model="photo" accept="image/*" style="font-size: 0.875rem;">
+                </div>
+                @error('photo') <span class="error">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="glass-panel" style="margin-bottom: 0.75rem;">
+                <div class="panel-header" style="font-size: 0.875rem; font-weight: 600; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--crm-divider);">
+                    {{ __('general.official_documents') }}
+                </div>
+                <div style="padding: 0.75rem;">
+                    @if($contact)
+                        @foreach($contact->documents as $doc)
+                            <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid var(--crm-divider-dashed);">
+                                <span style="font-size: 1rem;">
+                                    @if(str_contains($doc->file_type, 'pdf'))
+                                        📄
+                                    @else
+                                        🖼️
+                                    @endif
+                                </span>
+                                <span style="flex: 1; font-size: 0.875rem;">{{ $doc->notes ?? $doc->file_name }}</span>
+                                <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="btn btn-sm" style="font-size: 0.75rem;">{{ __('general.view') }}</a>
+                                <button type="button" wire:click="deleteExistingDocument({{ $doc->id }})" wire:confirm="{{ __('general.confirm_delete_doc') }}" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.875rem;">✕</button>
+                            </div>
+                        @endforeach
+                        <div style="height: 0.5rem;"></div>
+                    @endif
+
+                    @foreach($documents as $i => $doc)
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0;">
+                            <span style="font-size: 0.875rem; white-space: nowrap;">
+                                @if($doc && is_object($doc))
+                                    @if(str_contains($doc->getMimeType(), 'pdf')) 📄 @else 🖼️ @endif
+                                    {{ $documentNotes[$i] ?? $doc->getClientOriginalName() }}
+                                @else
+                                    📄 {{ $documentNotes[$i] ?? __('general.new_file') . ' ' . ($i + 1) }}
+                                @endif
+                            </span>
+                            <input type="text" wire:model="documentNotes.{{ $i }}" placeholder="{{ __('general.doc_notes_placeholder') }}" style="flex: 1; font-size: 0.8rem; padding: 0.25rem 0.5rem; border: 1px solid var(--crm-input-border); border-radius: 4px; background: var(--crm-input-bg); color: var(--crm-text);">
+                            <button type="button" wire:click="removeDocument({{ $i }})" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.875rem;">✕</button>
+                        </div>
+                    @endforeach
+
+                    <div style="margin-top: 0.5rem;">
+                        <input type="file" wire:model="documents.{{ count($documents) }}" accept=".pdf,.jpg,.jpeg,.png" style="font-size: 0.875rem;">
+                    </div>
+                    @error('documents.*') <span class="error">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" wire:model.blur="email" placeholder="john@example.com">
+                    <label>{{ __('general.email') }}</label>
+                    <input type="email" wire:model.blur="email" placeholder="{{ __('general.email_placeholder') }}">
                     @error('email') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" wire:model.blur="phone" placeholder="+123456789">
+                    <label>{{ __('general.phone') }}</label>
+                    <input type="text" wire:model.blur="phone" placeholder="{{ __('general.phone_placeholder') }}">
                     @error('phone') <span class="error">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <div class="grid-3">
                 <div class="form-group">
-                    <label>Categories</label>
-                    <div class="checkbox-group" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.25rem;">
+                    <label>{{ __('general.categories') }}</label>
+                    <div class="checkbox-group" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem;">
                         @foreach($this->allowedCategoryOptions as $cat)
                         <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
                             <div style="position: relative; width: 1.1rem; height: 1.1rem; flex-shrink: 0;">
@@ -159,21 +220,21 @@
                     @error('categories') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Nationality</label>
+                    <label>{{ __('general.nationality') }}</label>
                     <select wire:model.live="nationality">
-                        <option value="Egyptian">Egyptian</option>
-                        <option value="American">American</option>
-                        <option value="British">British</option>
-                        <option value="Other">Other</option>
+                        <option value="Egyptian">{{ __('general.egyptian') }}</option>
+                        <option value="American">{{ __('general.american') }}</option>
+                        <option value="British">{{ __('general.british') }}</option>
+                        <option value="Other">{{ __('general.other') }}</option>
                     </select>
                     @error('nationality') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
+                    <label>{{ __('general.status') }}</label>
                     <select wire:model="status">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Alumni">Alumni</option>
+                        <option value="Active">{{ __('general.active') }}</option>
+                        <option value="Inactive">{{ __('general.inactive') }}</option>
+                        <option value="Alumni">{{ __('general.alumni') }}</option>
                     </select>
                     @error('status') <span class="error">{{ $message }}</span> @enderror
                 </div>
@@ -181,20 +242,20 @@
 
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Religion</label>
+                    <label>{{ __('general.religion') }}</label>
                     <select wire:model="religion">
-                        <option value="">-- Select --</option>
-                        <option value="Muslim">Muslim</option>
-                        <option value="Christian">Christian</option>
+                        <option value="">{{ __('general.select') }}</option>
+                        <option value="Muslim">{{ __('general.muslim') }}</option>
+                        <option value="Christian">{{ __('general.christian') }}</option>
                     </select>
                     @error('religion') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Gender</label>
+                    <label>{{ __('general.gender') }}</label>
                     <select wire:model="gender">
-                        <option value="">-- Select --</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
+                        <option value="">{{ __('general.select') }}</option>
+                        <option value="Male">{{ __('general.male') }}</option>
+                        <option value="Female">{{ __('general.female') }}</option>
                     </select>
                     @error('gender') <span class="error">{{ $message }}</span> @enderror
                 </div>
@@ -202,33 +263,105 @@
 
             @if($nationality === 'Egyptian')
             <div class="form-group">
-                <label>National ID (14 Digits)</label>
-                <input type="text" wire:model="national_id" placeholder="29001011234567">
+                <label>{{ __('general.national_id') }}</label>
+                <input type="text" wire:model="national_id" placeholder="{{ __('general.national_id_placeholder') }}">
                 @error('national_id') <span class="error">{{ $message }}</span> @enderror
-                <small style="color: var(--crm-text-muted); font-size: 0.75rem;">Age and birth date will be calculated automatically.</small>
+                <small style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ __('general.age_birth_auto') }}</small>
             </div>
             @else
             <div class="form-group">
-                <label>Passport Number</label>
-                <input type="text" wire:model="passport_no" placeholder="A1234567">
+                <label>{{ __('general.passport_no') }}</label>
+                <input type="text" wire:model="passport_no" placeholder="{{ __('general.passport_placeholder') }}">
                 @error('passport_no') <span class="error">{{ $message }}</span> @enderror
             </div>
             @endif
 
             @if(!$creatingMotherForStudent && in_array('Student', $categories))
             <hr class="divider">
-            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">📋 Student academic info is managed in the <a href="{{ route('students') }}" wire:navigate style="color: var(--crm-input-focus-border);">Students</a> section.</div>
+            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">{{ __('general.student_academic_info') }}</div>
             @endif
 
             <div class="actions">
                 @if($creatingMotherForStudent)
-                    <button type="button" wire:click="cancelMotherCreation" class="btn-secondary">← Back to Student</button>
-                    <button type="submit" class="btn-success">Save Mother & Return</button>
+                    <button type="button" wire:click="cancelMotherCreation" class="btn-secondary">{{ __('contacts.back_to_student') }}</button>
+                    <button type="submit" class="btn-success">{{ __('contacts.save_mother') }}</button>
                 @else
-                <a href="{{ route('contacts') }}" wire:navigate class="btn-secondary">Cancel</a>
-                <button type="submit" class="btn-primary">Save Contact</button>
+                <a href="{{ route('contacts') }}" wire:navigate class="btn-secondary">{{ __('general.cancel') }}</a>
+                <button type="submit" class="btn-primary">{{ __('contacts.save_contact') }}</button>
                 @endif
             </div>
         </form>
     </div>
+
+    @if($showDuplicateModal && $existingDuplicate)
+    <div class="modal-overlay" wire:ignore.self x-data x-init="$el.style.display='flex'">
+        <div class="modal-box" style="background: var(--crm-panel-bg); backdrop-filter: blur(10px); border-radius: 1rem; border: 1px solid var(--crm-panel-border); padding: 2rem; max-width: 480px; width: 100%; margin: 2rem auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--crm-text); margin: 0 0 0.5rem;">{{ __('general.duplicate_found') }}</h3>
+            <p style="color: var(--crm-text-muted); font-size: 0.9rem; margin-bottom: 0.75rem;">
+                {{ __('general.duplicate_national_id') }} <strong>{{ $national_id }}</strong>
+            </p>
+            <div style="background: var(--crm-input-bg); border-radius: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem; border: 1px solid var(--crm-divider);">
+                <div style="font-weight: 600; color: var(--crm-text);">{{ $existingDuplicate->nameEn }} ({{ $existingDuplicate->nameAr }})</div>
+                <div style="color: var(--crm-text-muted); font-size: 0.85rem; margin-top: 0.75rem;">{{ __('general.status') }}: {{ $existingDuplicate->status }} | {{ __('general.categories') }}: {{ collect($existingDuplicate->categories ?? [])->map(fn($c) => __('general.' . strtolower($c)))->implode(', ') }}</div>
+            </div>
+            <p style="color: var(--crm-text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">{{ __('general.what_to_do') }}</p>
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button wire:click="ignoreDuplicate" class="btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">{{ __('general.ignore') }}</button>
+                <button wire:click="confirmUpdateExisting" class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">{{ __('general.update_existing') }}</button>
+            </div>
+        </div>
+    </div>
+    <style>
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center; padding: 1rem;
+        }
+        /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
+
+    input[type="checkbox"] {
+        appearance: none; -webkit-appearance: none;
+        width: 1.1rem; height: 1.1rem;
+        border-radius: 0.2rem;
+        border: 2px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+    }
+    input[type="checkbox"]:checked {
+        background: #6366f1; border-color: #6366f1;
+    }
+    input[type="checkbox"]:checked::after {
+        content: "\2713"; color: white; font-size: 0.65rem; font-weight: 700;
+    }
+</style>
+    @endif
 </div>

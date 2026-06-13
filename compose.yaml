@@ -127,6 +127,17 @@ services:
                 - '${DB_USERNAME}'
             retries: 3
             timeout: 5s
+    flutter-web:
+        build:
+            context: ./flutter
+            dockerfile: Dockerfile
+        ports:
+            - '${FLUTTER_PORT:-8080}:80'
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
+
 networks:
     sail:
         driver: bridge

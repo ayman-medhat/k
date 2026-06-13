@@ -25,22 +25,22 @@
     .crm-container {
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
-        min-height: 100vh; padding: 2rem;
+        min-height: 100vh; padding: 0.75rem 2rem;
     }
     .form-card {
         background: var(--crm-panel-bg);
         backdrop-filter: blur(10px);
         border-radius: 1rem; border: 1px solid var(--crm-panel-border);
-        padding: 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
+        padding: 0.75rem 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         max-width: 520px; margin: 0 auto;
     }
     .form-card h1 {
         font-size: 1.75rem; font-weight: 800; color: var(--crm-text);
-        margin-top: 0; margin-bottom: 1.5rem; letter-spacing: -0.5px;
+        margin-top: 0; margin-bottom: 0.75rem; letter-spacing: -0.5px;
     }
-    .form-group { margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 0.75rem; }
     .form-group label {
-        display: block; margin-bottom: 0.5rem;
+        display: block; margin-bottom: 0.75rem;
         font-weight: 500; color: var(--crm-text-muted); font-size: 0.875rem;
     }
     .form-group input, .form-group select {
@@ -54,9 +54,9 @@
         box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
         background: var(--crm-panel-bg);
     }
-    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; display: block; }
+    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.75rem; display: block; }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
         font-weight: 600; border: none; cursor: pointer;
         box-shadow: 0 4px 6px -1px rgba(99,102,241,0.4);
@@ -70,55 +70,81 @@
         text-decoration: none; display: inline-block;
     }
     .btn-secondary:hover { background: var(--crm-btn-secondary-hover); }
-    .actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; }
-    .hint { font-size: 0.75rem; color: var(--crm-text-muted); margin-top: 0.25rem; }
+    .actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 0.75rem; }
+    .hint { font-size: 0.75rem; color: var(--crm-text-muted); margin-top: 0.75rem; }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
 </style>
 
     <div class="form-card">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-            <a href="{{ route('users') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back</a>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <a href="{{ route('users') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ __('general.back') }}</a>
         </div>
-        <h1>{{ $user ? 'Edit User' : 'New User' }}</h1>
+        <h1>{{ $user ? __('users.edit_user') : __('users.new_user') }}</h1>
 
         <form wire:submit.prevent="save">
             <div class="form-group">
-                <label>Name</label>
-                <input type="text" wire:model.blur="name" placeholder="John Doe">
+                <label>{{ __('users.name') }}</label>
+                <input type="text" wire:model.blur="name" placeholder="{{ __('general.john_doe_en') }}">
                 @error('name') <span class="error">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" wire:model.blur="email" placeholder="john@example.com">
+                <label>{{ __('users.email') }}</label>
+                <input type="email" wire:model.blur="email" placeholder="{{ __('general.email_placeholder') }}">
                 @error('email') <span class="error">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
-                <label>Role</label>
+                <label>{{ __('users.role') }}</label>
                 <select wire:model="role">
-                    <option value="admin">Admin</option>
-                    <option value="hr">HR</option>
-                    <option value="student_affairs">Student Affairs</option>
-                    <option value="academic">Academic</option>
-                    <option value="control">Control</option>
+                    <option value="admin">{{ __('general.administrator') }}</option>
+                    <option value="hr">{{ __('nav.hr') }}</option>
+                    <option value="student_affairs">{{ __('nav.students_affairs') }}</option>
+                    <option value="academic">{{ __('nav.academic') }}</option>
+                    <option value="control">{{ __('nav.control') }}</option>
                 </select>
                 @error('role') <span class="error">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
-                <label>{{ $user ? 'New Password (leave blank to keep current)' : 'Password' }}</label>
+                <label>{{ $user ? 'New Password (leave blank to keep current)' : __('users.password') }}</label>
                 <input type="password" wire:model.blur="password" placeholder="Min 8 characters">
                 @error('password') <span class="error">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
-                <label>Confirm Password</label>
+                <label>{{ __('users.confirm_password') }}</label>
                 <input type="password" wire:model.blur="password_confirmation" placeholder="Repeat password">
             </div>
 
             <div class="actions">
-                <a href="{{ route('users') }}" wire:navigate class="btn-secondary">Cancel</a>
-                <button type="submit" class="btn-primary">Save</button>
+                <a href="{{ route('users') }}" wire:navigate class="btn-secondary">{{ __('general.cancel') }}</a>
+                <button type="submit" class="btn-primary">{{ __('general.save') }}</button>
             </div>
         </form>
     </div>

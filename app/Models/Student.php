@@ -77,9 +77,15 @@ class Student extends Model
         $diff = $birth->diff($oct1);
 
         $parts = [];
-        if ($diff->y > 0) $parts[] = $diff->y . ' year' . ($diff->y > 1 ? 's' : '');
-        if ($diff->m > 0) $parts[] = $diff->m . ' month' . ($diff->m > 1 ? 's' : '');
-        if ($diff->d >= 0) $parts[] = $diff->d . ' day' . ($diff->d > 1 ? 's' : '');
+        if (app()->getLocale() === 'ar') {
+            if ($diff->y > 0) $parts[] = $diff->y . ' سنة' . ($diff->y > 1 && $diff->y < 11 ? '' : '');
+            if ($diff->m > 0) $parts[] = $diff->m . ' شهر' . ($diff->m > 1 && $diff->m < 11 ? '' : '');
+            if ($diff->d >= 0) $parts[] = $diff->d . ' يوم' . ($diff->d > 1 && $diff->d < 11 ? '' : '');
+        } else {
+            if ($diff->y > 0) $parts[] = $diff->y . ' year' . ($diff->y > 1 ? 's' : '');
+            if ($diff->m > 0) $parts[] = $diff->m . ' month' . ($diff->m > 1 ? 's' : '');
+            if ($diff->d >= 0) $parts[] = $diff->d . ' day' . ($diff->d > 1 ? 's' : '');
+        }
 
         return implode(', ', $parts);
     }

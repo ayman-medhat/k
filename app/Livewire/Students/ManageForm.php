@@ -36,6 +36,11 @@ class ManageForm extends Component
 
     public function mount(?Student $student = null)
     {
+        if (auth()->user()->role === 'parent') {
+            $this->redirect(route('parent.dashboard'), navigate: true);
+            return;
+        }
+
         if (auth()->user()->isControl() && !$student) {
             $this->redirect(route('students'), navigate: true);
             return;

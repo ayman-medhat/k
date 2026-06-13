@@ -30,20 +30,21 @@
         font-family: "Inter", system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
         min-height: 100vh;
-        padding: 2rem;
+        padding: 0.75rem 2rem;
     }
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
+        height: 2.25rem;
     }
     .header h1 {
-        font-size: 2.5rem;
+        font-size: 1.2rem;
         color: var(--crm-text);
         margin: 0;
-        font-weight: 800;
-        letter-spacing: -1px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
     }
     .glass-panel {
         background: var(--crm-panel-bg);
@@ -51,7 +52,7 @@
         -webkit-backdrop-filter: blur(10px);
         border-radius: 1rem;
         border: 1px solid var(--crm-panel-border);
-        padding: 2rem;
+        padding: 0.75rem 2rem;
         box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         overflow-x: auto;
     }
@@ -62,7 +63,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 0.75rem;
-        margin-bottom: 2rem;
+        margin-bottom: 0.75rem;
     }
     .grade-chip {
         padding: 0.75rem 1rem;
@@ -82,11 +83,11 @@
     }
     .grade-chip.active {
         border-color: #6366f1;
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white;
     }
     .subject-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
     }
     .subject-group-title {
         font-weight: 700;
@@ -105,16 +106,34 @@
         border-radius: 0.5rem;
         cursor: pointer;
         transition: background 0.15s;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.75rem;
     }
     .subject-check:hover {
         background: var(--crm-input-bg);
     }
     .subject-check input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
         width: 1.1rem;
         height: 1.1rem;
-        accent-color: #6366f1;
+        border-radius: 0.2rem;
+        border: 2px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+    }
+    .subject-check input[type="checkbox"]:checked {
+        background: #6366f1;
+        border-color: #6366f1;
+    }
+    .subject-check input[type="checkbox"]:checked::after {
+        content: "\2713";
+        color: white;
+        font-size: 0.65rem;
+        font-weight: 700;
     }
     .subject-check label {
         cursor: pointer;
@@ -163,6 +182,32 @@
         padding: 3rem;
         color: var(--crm-text-muted);
     }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
 </style>
 
     <div class="header">
@@ -186,7 +231,7 @@
         @if($selectedGradeId)
             <hr style="border: none; border-top: 1px solid var(--crm-border); margin: 1.5rem 0;">
 
-            <div style="font-weight: 600; color: var(--crm-text); margin-bottom: 1rem;">
+            <div style="font-weight: 600; color: var(--crm-text); margin-bottom: 0.75rem;">
                 Subjects for <span style="color: var(--crm-input-focus-border);">{{ $this->grades->firstWhere("id", $selectedGradeId)?->name }}</span>
             </div>
 

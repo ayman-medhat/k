@@ -1,3 +1,10 @@
+{{-- ============================================================
+     Leads Management View
+     Dual-mode (list/cards) with search, age sort, category/stage
+     filters, bulk accept/refuse, and select-all.
+     Parents see a stripped-down read-only "Admission Status" view
+     scoped to their own children.
+     ============================================================ --}}
 <div class="crm-container">
 <style>
     :root {
@@ -102,21 +109,22 @@
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
         min-height: 100vh;
-        padding: 2rem;
+        padding: 0.75rem 2rem;
     }
 
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
+        height: 2.25rem;
     }
     .header h1 {
-        font-size: 2.5rem;
+        font-size: 1.2rem;
         color: var(--crm-text);
         margin: 0;
-        font-weight: 800;
-        letter-spacing: -1px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
     }
     .header-actions {
         display: flex;
@@ -138,6 +146,9 @@
         font-weight: 600;
         color: var(--crm-text-muted);
         cursor: pointer;
+        height: 2.25rem;
+        display: inline-flex;
+        align-items: center;
         transition: all 0.2s;
         font-size: 0.875rem;
     }
@@ -147,7 +158,7 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white;
         padding: 0.75rem 1.5rem;
         border-radius: 9999px;
@@ -163,7 +174,7 @@
         box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
     }
     .btn-success {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: var(--crm-btn-success-bg);
         color: white;
         padding: 0.5rem 1rem;
         border-radius: 9999px;
@@ -184,7 +195,7 @@
         -webkit-backdrop-filter: blur(10px);
         border-radius: 1rem;
         border: 1px solid var(--crm-panel-border);
-        padding: 2rem;
+        padding: 0.75rem 2rem;
         box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         overflow-x: auto;
     }
@@ -209,10 +220,12 @@
         text-transform: uppercase;
         font-size: 0.75rem;
         letter-spacing: 0.05em;
+        text-align: center;
     }
     td {
         color: var(--crm-text);
         font-size: 0.875rem;
+        text-align: center;
     }
     .badge {
         padding: 0.25rem 0.75rem;
@@ -257,7 +270,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
     .card-title {
         font-weight: 600;
@@ -267,7 +280,7 @@
     .card-subtitle {
         color: var(--crm-text-muted);
         font-size: 0.875rem;
-        margin-top: 0.25rem;
+        margin-top: 0.75rem;
     }
     .card-badges {
         display: flex;
@@ -295,12 +308,12 @@
         font-weight: 700;
     }
     .card-body {
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
     }
     .card-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         font-size: 0.875rem;
         border-bottom: 1px dashed var(--crm-divider-dashed);
         padding-bottom: 0.25rem;
@@ -325,11 +338,11 @@
         padding-top: 1rem;
     }
     .form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 0.75rem;
     }
     .form-group label {
         display: block;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         font-weight: 500;
         color: var(--crm-text-muted);
         font-size: 0.875rem;
@@ -362,7 +375,7 @@
     .error {
         color: #ef4444;
         font-size: 0.75rem;
-        margin-top: 0.25rem;
+        margin-top: 0.75rem;
         display: block;
     }
     .btn-secondary {
@@ -382,7 +395,7 @@
         display: flex;
         gap: 1rem;
         justify-content: flex-end;
-        margin-top: 2rem;
+        margin-top: 0.75rem;
     }
     .btn-icon {
         background: none;
@@ -405,16 +418,16 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
     }
     .cat-tab {
         display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
-        padding: 0.5rem 1.1rem;
+        gap: 0.2rem;
+        padding: 0.4rem 0.8rem;
         border-radius: 9999px;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.65rem;
         cursor: pointer;
         border: 2px solid transparent;
         background: var(--crm-tab-bg);
@@ -449,8 +462,8 @@
     .stage-sub-bar {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.4rem;
-        margin-bottom: 1.25rem;
+        gap: 0.2rem;
+        margin-bottom: 0.75rem;
         padding: 0.6rem 0.8rem;
         background: rgba(99,102,241,0.05);
         border-radius: 0.75rem;
@@ -459,11 +472,11 @@
     .stage-chip {
         display: inline-flex;
         align-items: center;
-        gap: 0.3rem;
-        padding: 0.35rem 0.9rem;
+        gap: 0.2rem;
+        padding: 0.25rem 0.7rem;
         border-radius: 9999px;
         font-weight: 500;
-        font-size: 0.8rem;
+        font-size: 0.6rem;
         cursor: pointer;
         border: none;
         background: var(--crm-tab-bg);
@@ -479,25 +492,89 @@
         color: white;
         box-shadow: 0 2px 8px rgba(99,102,241,0.3);
     }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
+    input[type="checkbox"] {
+        appearance: none; -webkit-appearance: none;
+        width: 1.1rem; height: 1.1rem;
+        border-radius: 0.25rem;
+        border: 2px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+    }
+    input[type="checkbox"]:checked {
+        background: #6366f1; border-color: #6366f1;
+    }
+    input[type="checkbox"]:checked::after {
+        content: "\2713"; color: white; font-size: 0.65rem; font-weight: 700;
+    }
 </style>
 
+    @if($message)
+    <div style="background: #059669; color: white; padding: 0.75rem 1rem; border-radius: 0.75rem; margin-bottom: 0.75rem; font-weight: 600;">
+        {{ $message }}
+    </div>
+    @endif
+
     <div class="header">
-        <h1>Leads Pipeline</h1>
+        <h1>{{ $isParent ? __('nav.admission_status') : __('leads.page_title') }}</h1>
+        @if(!$isParent)
+        <input
+            type="text"
+            wire:model.live.debounce.300ms="search"
+            placeholder="{{ __('general.search_name_placeholder') }}"
+            class="search-box"
+            style="max-width: 500px; flex: 1; min-width: 150px;"
+        />
+        @endif
         <div class="header-actions">
             <div class="toggle-group">
                 <button wire:click="$set('viewMode', 'list')" class="toggle-btn {{ $viewMode === 'list' ? 'active' : '' }}">
                     <svg style="width: 1rem; height: 1rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                    List
+                    {{ __('general.list') }}
                 </button>
                 <button wire:click="$set('viewMode', 'cards')" class="toggle-btn {{ $viewMode === 'cards' ? 'active' : '' }}">
                     <svg style="width: 1rem; height: 1rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    Cards
+                    {{ __('general.cards') }}
                 </button>
             </div>
-            <a href="{{ route('leads.create') }}" wire:navigate class="btn-primary">+ Add New Lead</a>
+            @if(!$isParent)
+            <a href="{{ route('leads.import') }}" wire:navigate class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.import') }}</a>
+            <button wire:click="translateAllNames" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('leads.translate_all') }}</button>
+            <a href="{{ route('leads.create') }}" wire:navigate class="btn-primary">{{ __('leads.add_new') }}</a>
+            @endif
         </div>
     </div>
 
+    @if(!$isParent)
     {{-- Category Filter Tabs --}}
     @php
         $categories = $allowedCategories ?? ['All', 'Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'];
@@ -509,7 +586,7 @@
             wire:click="$set('filterCategory', '{{ $cat }}')"
             class="cat-tab {{ $filterCategory === $cat ? 'active' : '' }}"
         >
-            {{ $catIcons[$cat] }} {{ $cat }}
+            {{ $catIcons[$cat] }} {{ __($cat === 'All' ? 'general.all' : 'general.' . strtolower($cat)) }}
             @if($cat === 'All')
                 <span class="count-pill">{{ $totalCount }}</span>
             @elseif(isset($categoryCounts[$cat]))
@@ -517,211 +594,260 @@
             @endif
         </button>
         @endforeach
+        <select
+            wire:model.live="sortAge"
+            style="margin-left: auto; padding: 0.5rem 1rem; border-radius: 9999px; border: 1px solid var(--crm-input-border); background: var(--crm-input-bg); color: var(--crm-text); font-size: 0.85rem; outline: none; cursor: pointer; transition: all 0.2s;"
+        >
+            <option value="">{{ __('leads.sort_by_age') }}</option>
+            <option value="desc">{{ __('leads.younger_older') }}</option>
+            <option value="asc">{{ __('leads.older_younger') }}</option>
+        </select>
     </div>
 
-    <div x-show="$wire.filterCategory === 'Student'"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 transform -translate-y-2"
-         x-transition:enter-end="opacity-100 transform translate-y-0"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 transform translate-y-0"
-         x-transition:leave-end="opacity-0 transform -translate-y-2">
-    <div class="stage-sub-bar">
-        <button wire:click="$set('filterStage', '')" class="stage-chip {{ $filterStage === '' ? 'active' : '' }}">
-            All Stages
-        </button>
-        @foreach($this->allStages as $stage)
-        <button wire:click="$set('filterStage', '{{ $stage->id }}')" class="stage-chip {{ $filterStage == $stage->id ? 'active' : '' }}">
-            {{ $stage->name }}
-        </button>
-        @endforeach
+    <div class="stage-sub-bar" style="flex-wrap: wrap; gap: 0.75rem;">
+        <div x-show="$wire.filterCategory === 'Student'"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform -translate-y-2"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-2"
+             style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+            <button wire:click="$set('filterStage', '')" class="stage-chip {{ $filterStage === '' ? 'active' : '' }}">
+                {{ __('leads.all_stages') }}
+            </button>
+            @foreach($this->allStages as $stage)
+            <button wire:click="$set('filterStage', '{{ $stage->id }}')" class="stage-chip {{ $filterStage == $stage->id ? 'active' : '' }}">
+                {{ $stage->name }}
+            </button>
+            @endforeach
+        </div>
     </div>
-    </div>
+    @endif
 
     @if($viewMode === 'list')
     <div class="glass-panel">
+        @if(!$isParent && count($selectedLeads) > 0)
+        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem; background: rgba(99,102,241,0.08); border-radius: 0.75rem; border: 1px solid rgba(99,102,241,0.15);">
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--crm-tab-active-text);">{{ count($selectedLeads) }} {{ __('general.selected') }}</span>
+            <button wire:click="bulkAccept" wire:confirm="{{ __('leads.accept_count', ['count' => count($selectedLeads)]) }}" class="btn-success" style="font-size: 0.75rem; padding: 0.4rem 0.9rem;">{{ __('general.accept_selected') }}</button>
+            <button wire:click="bulkRefuse" wire:confirm="{{ __('leads.refuse_count', ['count' => count($selectedLeads)]) }}" class="btn-icon" style="font-size: 0.75rem; padding: 0.4rem 0.9rem; color: #f59e0b; border: 1px solid #f59e0b; border-radius: 0.5rem;">{{ __('general.refuse_selected') }}</button>
+            <button wire:click="$set('selectedLeads', [])" class="btn-icon" style="font-size: 0.8rem; color: var(--crm-text-muted);">{{ __('general.clear_selection') }}</button>
+        </div>
+        @endif
         <table>
             <thead>
                 <tr>
-                    <th style="width: 20%;">Name (En/Ar)</th>
-                    <th style="width: 1%;">Relation</th>
-                    <th>Category</th>
-                    <th>Religion</th>
-                    <th>Gender</th>
-                    <th>Grade</th>
-                    <th>Age at 1st Oct</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    @if(!$isParent)
+                    <th style="width: 1%;">
+                        <input type="checkbox" wire:model.live="selectAll" style="cursor: pointer;">
+                    </th>
+                    @endif
+                    <th style="width: 20%;">{{ __('general.name_en_ar') }}</th>
+                    <th style="width: 1%;">{{ __('general.relation') }}</th>
+                    <th>{{ __('general.category') }}</th>
+                    <th>{{ __('general.religion') }}</th>
+                    <th>{{ __('general.gender') }}</th>
+                    <th>{{ __('general.grade') }}</th>
+                    <th>{{ __('general.age_at_oct_short') }}</th>
+                    <th>{{ __('general.status') }}</th>
+                    @if(!$isParent)
+                    <th>{{ __('general.actions') }}</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
                 @forelse($leads as $lead)
                 <tr>
-                    <td style="width: 20%; word-break: break-word;">
-                        <div style="font-weight: 600; color: var(--crm-text);">{{ $lead->nameEn }}</div>
-                        <div style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ $lead->nameAr }}</div>
-                        @if($lead->status === 'Accepted')
-                        <div style="color: #059669; font-size: 0.75rem; margin-top: 0.25rem; font-weight: 600;">✓ Accepted</div>
+                    @if(!$isParent)
+                    <td>
+                        @if($lead->status !== 'Accepted')
+                        <input type="checkbox" class="lead-checkbox" value="{{ $lead->id }}" wire:model.live="selectedLeads" style="cursor: pointer;">
                         @endif
                     </td>
+                    @endif
+            <td style="width: 20%; word-break: break-word; text-align: left;">
+                <div style="font-weight: 600; color: var(--crm-text);">
+                    {{ app()->getLocale() === 'ar' ? $lead->nameAr : $lead->nameEn }}
+                </div>
+                <div style="color: var(--crm-text-muted); font-size: 0.75rem;">
+                    {{ app()->getLocale() === 'ar' ? $lead->nameEn : $lead->nameAr }}
+                </div>
+                @if($lead->status === 'Accepted')
+                <div style="color: #059669; font-size: 0.75rem; margin-top: 0.75rem; font-weight: 600;">
+                    {{ __('leads.accepted') }}
+                </div>
+                @endif
+            </td>
                     <td>
                         @if(in_array('Student', $lead->categories ?? []))
                             @if($lead->parent)
-                            <div style="font-size: 0.8rem; color: #d97706;">👨 {{ $lead->parent->nameEn }}</div>
+                            <div style="font-size: 0.8rem; color: #d97706;">👨 {{ app()->getLocale() === 'ar' ? $lead->parent->nameAr : $lead->parent->nameEn }}</div>
                             @endif
                             @if($lead->mother)
-                            <div style="font-size: 0.8rem; color: #8b5cf6; margin-top: 0.15rem;">👩 {{ $lead->mother->nameEn }}</div>
+                            <div style="font-size: 0.8rem; color: #8b5cf6; margin-top: 0.75rem;">👩 {{ app()->getLocale() === 'ar' ? $lead->mother->nameAr : $lead->mother->nameEn }}</div>
                             @endif
                             @if(!$lead->parent && !$lead->mother)
-                            <div style="color: var(--crm-text-muted); font-size: 0.8rem;">—</div>
+                            <div style="color: var(--crm-text-muted); font-size: 0.8rem;">{{ __('general.no_data') }}</div>
                             @endif
                         @elseif(in_array('Parent', $lead->categories ?? []) && $lead->children->count())
                             @foreach($lead->children as $child)
-                            <div style="font-size: 0.8rem; color: var(--crm-text);">🎒 {{ $child->nameEn }}</div>
+                            <div style="font-size: 0.8rem; color: var(--crm-text);">🎒 {{ app()->getLocale() === 'ar' ? $child->nameAr : $child->nameEn }}</div>
                             @endforeach
                         @else
-                            <div>{{ $lead->email ?? 'N/A' }}</div>
-                            <div style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ $lead->phone ?? 'N/A' }}</div>
+                            <div>{{ $lead->email ?? __('general.na') }}</div>
+                            <div style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ $lead->phone ?? __('general.na') }}</div>
                         @endif
                     </td>
                     <td>
                         @foreach($lead->categories ?? [] as $cat)
                             <span class="badge {{ $cat === 'Student' ? 'badge-student' : ($cat === 'Parent' ? 'badge-parent' : '') }}" style="display: inline-block; margin: 0.1rem;">
-                                {{ $cat }}
+                                {{ __("general." . strtolower($cat)) }}
                             </span>
                         @endforeach
                     </td>
-                    <td>{{ $lead->religion ?? '—' }}</td>
-                    <td>{{ $lead->gender ?? '—' }}</td>
+                    <td>{{ app()->getLocale() === 'ar' ? ($lead->religion_ar ?? __('general.' . strtolower($lead->religion))) : $lead->religion }}</td>
+                    <td>{{ app()->getLocale() === 'ar' ? ($lead->gender_ar ?? __('general.' . strtolower($lead->gender))) : $lead->gender }}</td>
                     <td>
                         @if(in_array('Student', $lead->categories ?? []) && $lead->grade)
                             <span style="font-size: 0.875rem;">{{ $lead->grade->name }}</span>
                         @else
-                            <span style="color: var(--crm-text-muted); font-size: 0.75rem;">—</span>
+                            <span style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ __('general.no_data') }}</span>
                         @endif
                     </td>
                     <td>
                         @if(in_array('Student', $lead->categories ?? []) && $lead->birth_date)
                             <div style="font-size: 0.875rem;">{{ \App\Models\Student::formatAgeAtOctober($lead->birth_date->format('Y-m-d')) }}</div>
-                            <div style="color: var(--crm-text-muted); font-size: 0.75rem;">Age at 1st October</div>
                         @else
-                            <span style="color: var(--crm-text-muted); font-size: 0.75rem;">—</span>
+                            <span style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ __('general.no_data') }}</span>
                         @endif
                     </td>
-                    <td><span class="badge">{{ $lead->status }}</span></td>
+                    <td><span class="badge">{{ app()->getLocale() === 'ar' ? ($lead->status_ar ?? __('general.' . strtolower($lead->status))) : $lead->status }}</span></td>
+                    @if(!$isParent)
                     <td>
                         @if($lead->status === 'Accepted')
-                        <span style="color: #059669; font-weight: 600; font-size: 0.8rem;">✔ Transferred</span>
+                        <span style="color: #059669; font-weight: 600; font-size: 0.8rem;">{{ __('leads.transferred') }}</span>
                         @else
-                        <a href="{{ route('leads.edit', $lead) }}" wire:navigate class="btn-icon">Edit</a>
-                        <button wire:click="accept({{ $lead->id }})" wire:confirm="Accept this lead and copy to contacts?" class="btn-icon" style="color: #10b981; margin-left: 0.5rem;">Accept</button>
-                        <button wire:click="delete({{ $lead->id }})" wire:confirm="Are you sure you want to delete this lead?" class="btn-icon" style="color: #ef4444; margin-left: 0.5rem;">Delete</button>
+                        <a href="{{ route('leads.edit', $lead) }}" wire:navigate class="btn-icon">{{ __('general.edit') }}</a>
+                        <button wire:click="accept({{ $lead->id }})" wire:confirm="{{ __('leads.accept_confirm') }}" class="btn-icon" style="color: #10b981; margin-left: 0.5rem;">{{ __('leads.accept') }}</button>
+                        <button wire:click="refuse({{ $lead->id }})" wire:confirm="{{ __('leads.refuse_confirm') }}" class="btn-icon" style="color: #f59e0b; margin-left: 0.5rem;">{{ __('leads.refuse') }}</button>
+                        <button wire:click="delete({{ $lead->id }})" wire:confirm="{{ __('leads.delete_confirm') }}" class="btn-icon" style="color: #ef4444; margin-left: 0.5rem;">{{ __('general.delete') }}</button>
                         @endif
                     </td>
+                    @endif
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="10" style="text-align: center; padding: 2rem; color: var(--crm-text-muted);">No leads found. Start by adding one!</td>
+                    <td colspan="11" style="text-align: center; padding: 2rem; color: var(--crm-text-muted);">{{ __('leads.no_leads') }}</td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
-        <div style="margin-top: 1rem;">
+        <div style="margin-top: 0.75rem;">
             {{ $leads->links() }}
         </div>
     </div>
     @else
+    @if(!$isParent && count($selectedLeads) > 0)
+    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem; background: rgba(99,102,241,0.08); border-radius: 0.75rem; border: 1px solid rgba(99,102,241,0.15);">
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--crm-tab-active-text);">{{ count($selectedLeads) }} {{ __('general.selected') }}</span>
+        <button wire:click="bulkAccept" wire:confirm="{{ __('leads.accept_count', ['count' => count($selectedLeads)]) }}" class="btn-success" style="font-size: 0.75rem; padding: 0.4rem 0.9rem;">{{ __('general.accept_selected') }}</button>
+        <button wire:click="bulkRefuse" wire:confirm="{{ __('leads.refuse_count', ['count' => count($selectedLeads)]) }}" class="btn-icon" style="font-size: 0.75rem; padding: 0.4rem 0.9rem; color: #f59e0b; border: 1px solid #f59e0b; border-radius: 0.5rem;">{{ __('general.refuse_selected') }}</button>
+        <button wire:click="$set('selectedLeads', [])" class="btn-icon" style="font-size: 0.8rem; color: var(--crm-text-muted);">{{ __('general.clear_selection') }}</button>
+    </div>
+    @endif
     <div class="cards-grid">
         @forelse($leads as $lead)
         <div class="card {{ in_array('Student', $lead->categories ?? []) && $lead->parent ? 'has-parent' : '' }}">
             <div class="card-header">
                 <div>
                     <div class="card-title">
-                        {{ $lead->nameEn }}
+                        {{ app()->getLocale() === 'ar' ? $lead->nameAr : $lead->nameEn }}
                         @if($lead->status === 'Accepted')
-                        <span style="font-size: 0.7rem; background: #059669; color: white; padding: 0.15rem 0.5rem; border-radius: 9999px; vertical-align: middle; margin-left: 0.4rem;">Accepted</span>
+                        <span style="font-size: 0.7rem; background: #059669; color: white; padding: 0.15rem 0.5rem; border-radius: 9999px; vertical-align: middle; margin-left: 0.4rem;">{{ __('leads.accepted') }}</span>
                         @endif
                     </div>
-                    <div class="card-subtitle">{{ $lead->nameAr }}</div>
+                    <div class="card-subtitle">{{ app()->getLocale() === 'ar' ? $lead->nameEn : $lead->nameAr }}</div>
                 </div>
                 <div class="card-badges">
                     @foreach($lead->categories ?? [] as $cat)
                         <span class="badge {{ $cat === 'Student' ? 'badge-student' : ($cat === 'Parent' ? 'badge-parent' : '') }}" style="display: inline-block;">
-                            {{ $cat }}
+                            {{ __("general." . strtolower($cat)) }}
                         </span>
                     @endforeach
-                    <span class="badge">{{ $lead->status }}</span>
+                    <span class="badge">{{ app()->getLocale() === 'ar' ? ($lead->status_ar ?? __('general.' . strtolower($lead->status))) : $lead->status }}</span>
                 </div>
             </div>
 
             <div class="card-body">
                 <div class="card-row">
-                    <span class="card-label">Relation</span>
+                    <span class="card-label">{{ __('general.relation') }}</span>
                     <span class="card-value" style="text-align: right;">
                         @if(in_array('Student', $lead->categories ?? []))
-                            @if($lead->parent)<div style="color: #d97706;">👨 {{ $lead->parent->nameEn }}</div>@endif
-                            @if($lead->mother)<div style="color: #8b5cf6;">👩 {{ $lead->mother->nameEn }}</div>@endif
-                            @if(!$lead->parent && !$lead->mother)<span style="color: var(--crm-text-muted);">—</span>@endif
+                            @if($lead->parent)<div style="color: #d97706;">👨 {{ app()->getLocale() === 'ar' ? $lead->parent->nameAr : $lead->parent->nameEn }}</div>@endif
+                            @if($lead->mother)<div style="color: #8b5cf6;">👩 {{ app()->getLocale() === 'ar' ? $lead->mother->nameAr : $lead->mother->nameEn }}</div>@endif
+                            @if(!$lead->parent && !$lead->mother)<span style="color: var(--crm-text-muted);">{{ __('general.no_data') }}</span>@endif
                         @elseif(in_array('Parent', $lead->categories ?? []) && $lead->children->count())
                             @foreach($lead->children as $child)
-                            <div>🎒 {{ $child->nameEn }}</div>
+                            <div>🎒 {{ app()->getLocale() === 'ar' ? $child->nameAr : $child->nameEn }}</div>
                             @endforeach
                         @else
-                            <div>{{ $lead->email ?? 'N/A' }}</div>
-                            <div style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ $lead->phone ?? 'N/A' }}</div>
+                            <div>{{ $lead->email ?? __('general.na') }}</div>
+                            <div style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ $lead->phone ?? __('general.na') }}</div>
                         @endif
                     </span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">Grade</span>
-                    <span class="card-value">{{ in_array('Student', $lead->categories ?? []) && $lead->grade ? $lead->grade->name : '—' }}</span>
+                    <span class="card-label">{{ __('general.grade') }}</span>
+                    <span class="card-value">{{ in_array('Student', $lead->categories ?? []) && $lead->grade ? $lead->grade->name : __('general.no_data') }}</span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">Religion</span>
-                    <span class="card-value">{{ $lead->religion ?? '—' }}</span>
+                    <span class="card-label">{{ __('general.religion') }}</span>
+                    <span class="card-value">{{ app()->getLocale() === 'ar' ? ($lead->religion_ar ?? __('general.' . strtolower($lead->religion))) : $lead->religion }}</span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">Gender</span>
-                    <span class="card-value">{{ $lead->gender ?? '—' }}</span>
+                    <span class="card-label">{{ __('general.gender') }}</span>
+                    <span class="card-value">{{ app()->getLocale() === 'ar' ? ($lead->gender_ar ?? __('general.' . strtolower($lead->gender))) : $lead->gender }}</span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">Birthday</span>
-                    <span class="card-value">{{ $lead->birth_date ? $lead->birth_date->format('M d, Y') : 'N/A' }}</span>
+                    <span class="card-label">{{ __('general.birthday') }}</span>
+                    <span class="card-value">{{ $lead->birth_date ? $lead->birth_date->format('M d, Y') : __('general.na') }}</span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">Age at 1st Oct</span>
+                    <span class="card-label">{{ __('general.age_at_oct_short') }}</span>
                     <span class="card-value">
                         @if(in_array('Student', $lead->categories ?? []) && $lead->birth_date)
                             {{ \App\Models\Student::formatAgeAtOctober($lead->birth_date->format('Y-m-d')) }}
                         @else
-                            N/A
+                            {{ __('general.na') }}
                         @endif
                     </span>
                 </div>
                 @if(in_array('Parent', $lead->categories ?? []) && $lead->children->count() > 1)
                 <div class="card-row">
-                    <span class="card-label">Children Count</span>
+                    <span class="card-label">{{ __('general.children_count') }}</span>
                     <span class="card-value">{{ $lead->children->count() }}</span>
                 </div>
                 @endif
             </div>
             <div class="card-actions">
                 @if($lead->status === 'Accepted')
-                <span style="color: #059669; font-weight: 600; font-size: 0.85rem;">✔ Transferred to Contacts</span>
-                @else
-                <a href="{{ route('leads.edit', $lead) }}" wire:navigate class="btn-icon">Edit</a>
-                <button wire:click="accept({{ $lead->id }})" wire:confirm="Accept this lead and copy to contacts?" class="btn-icon" style="color: #10b981;">Accept</button>
-                <button wire:click="delete({{ $lead->id }})" wire:confirm="Are you sure you want to delete this lead?" class="btn-icon" style="color: #ef4444;">Delete</button>
+                <span style="color: #059669; font-weight: 600; font-size: 0.85rem;">{{ __('leads.transferred_to_contacts') }}</span>
+                @elseif(!$isParent)
+                <a href="{{ route('leads.edit', $lead) }}" wire:navigate class="btn-icon">{{ __('general.edit') }}</a>
+                <button wire:click="accept({{ $lead->id }})" wire:confirm="{{ __('leads.accept_confirm') }}" class="btn-icon" style="color: #10b981;">{{ __('leads.accept') }}</button>
+                <button wire:click="refuse({{ $lead->id }})" wire:confirm="{{ __('leads.refuse_confirm') }}" class="btn-icon" style="color: #f59e0b;">{{ __('leads.refuse') }}</button>
+                <button wire:click="delete({{ $lead->id }})" wire:confirm="{{ __('leads.delete_confirm') }}" class="btn-icon" style="color: #ef4444;">{{ __('general.delete') }}</button>
                 @endif
             </div>
         </div>
         @empty
         <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--crm-text-muted); background: var(--crm-empty-bg); border-radius: 1rem;">
-            No leads found. Start by adding one!
+{{ __('leads.no_leads') }}
         </div>
         @endforelse
     </div>
-    <div style="margin-top: 1rem;">
+    <div style="margin-top: 0.75rem;">
         {{ $leads->links() }}
     </div>
     @endif

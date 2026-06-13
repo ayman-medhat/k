@@ -52,23 +52,24 @@
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
         min-height: 100vh;
-        padding: 2rem;
+        padding: 0.75rem 2rem;
     }
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
+        height: 2.25rem;
     }
     .header h1 {
-        font-size: 2.5rem;
+        font-size: 1.2rem;
         color: var(--crm-text);
         margin: 0;
-        font-weight: 800;
-        letter-spacing: -1px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
     }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white;
         padding: 0.75rem 1.5rem;
         border-radius: 9999px;
@@ -102,7 +103,7 @@
         -webkit-backdrop-filter: blur(10px);
         border-radius: 1rem;
         border: 1px solid var(--crm-panel-border);
-        padding: 2rem;
+        padding: 0.75rem 2rem;
         box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         overflow-x: auto;
     }
@@ -121,11 +122,11 @@
         color: var(--crm-input-focus-border, #4f46e5);
     }
     .form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 0.75rem;
     }
     .form-group label {
         display: block;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         font-weight: 500;
         color: var(--crm-text-muted);
         font-size: 0.875rem;
@@ -149,14 +150,14 @@
     .error {
         color: #ef4444;
         font-size: 0.75rem;
-        margin-top: 0.25rem;
+        margin-top: 0.75rem;
         display: block;
     }
     .actions {
         display: flex;
         gap: 1rem;
         justify-content: flex-end;
-        margin-top: 2rem;
+        margin-top: 0.75rem;
     }
     .empty-state {
         text-align: center;
@@ -182,6 +183,9 @@
         font-weight: 600;
         color: var(--crm-text-muted);
         cursor: pointer;
+        height: 2.25rem;
+        display: inline-flex;
+        align-items: center;
         transition: all 0.2s;
         font-size: 0.875rem;
     }
@@ -303,7 +307,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
     .card-title {
         font-weight: 600;
@@ -313,15 +317,15 @@
     .card-subtitle {
         color: var(--crm-text-muted);
         font-size: 0.875rem;
-        margin-top: 0.25rem;
+        margin-top: 0.75rem;
     }
     .card-body {
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
     }
     .card-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         font-size: 0.875rem;
         border-bottom: 1px dashed var(--crm-divider-dashed);
         padding-bottom: 0.25rem;
@@ -346,7 +350,7 @@
         padding-top: 1rem;
     }
     .branch-list {
-        margin-top: 1rem;
+        margin-top: 0.75rem;
         padding-top: 0.75rem;
         border-top: 1px dashed var(--crm-divider-dashed);
     }
@@ -355,7 +359,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 0.4rem 0.75rem;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.75rem;
         border-radius: 0.5rem;
         background: var(--crm-branch-bg);
         font-size: 0.85rem;
@@ -369,10 +373,36 @@
         font-size: 0.8rem;
         margin-left: 0.5rem;
     }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
 </style>
 
     <div class="header">
-        <h1>Subjects</h1>
+        <h1>{{ __('subjects.page_title') }}</h1>
         <div style="display: flex; align-items: center;">
             <div class="toggle-group">
                 <button wire:click="$set('viewMode', 'list')" class="toggle-btn {{ $viewMode === 'list' ? 'active' : '' }}">
@@ -381,10 +411,10 @@
                 </button>
                 <button wire:click="$set('viewMode', 'cards')" class="toggle-btn {{ $viewMode === 'cards' ? 'active' : '' }}">
                     <svg style="width: 1rem; height: 1rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    Cards
+                    {{ __('general.cards') }}
                 </button>
             </div>
-            <a href="{{ route('subjects.create') }}" wire:navigate class="btn-primary">+ Add Subject</a>
+            <a href="{{ route('subjects.create') }}" wire:navigate class="btn-primary">{{ __('subjects.add_new') }}</a>
         </div>
     </div>
 
@@ -409,7 +439,7 @@
                                 <div style="font-size: 0.75rem; color: var(--crm-text-muted);">{{ $root->name_ar }}</div>
                             </div>
                             @if($root->is_religion_based)
-                                <span class="badge-religion">Religion</span>
+                                <span class="badge-religion">{{ __('general.religion') }}</span>
                             @elseif($root->is_main)
                                 <span class="badge-main">Main</span>
                             @else
@@ -423,8 +453,8 @@
                             @if($root->children->count())
                                 <span class="badge-" style="padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; background: #f3e8ff; color: #7c3aed; margin-right: 0.75rem;">{{ $root->children->count() }}</span>
                             @endif
-                            <a href="{{ route('subjects.edit', $root) }}" wire:navigate class="btn-icon" style="font-size: 0.8rem;">Edit</a>
-                            <button wire:click="delete({{ $root->id }})" wire:confirm="Delete this subject and all its branches?" class="btn-icon" style="color: #ef4444; font-size: 0.8rem;">Delete</button>
+                            <a href="{{ route('subjects.edit', $root) }}" wire:navigate class="btn-icon" style="font-size: 0.8rem;">{{ __('general.edit') }}</a>
+                            <button wire:click="delete({{ $root->id }})" wire:confirm="{{ __('subjects.delete_confirm') }}" class="btn-icon" style="color: #ef4444; font-size: 0.8rem;">{{ __('general.delete') }}</button>
                         </div>
                     </div>
                     @if($root->children->count())
@@ -446,8 +476,8 @@
                                         @endif
                                     </div>
                                     <div class="node-actions">
-                                        <a href="{{ route('subjects.edit', $child) }}" wire:navigate class="btn-icon" style="font-size: 0.8rem;">Edit</a>
-                                        <button wire:click="delete({{ $child->id }})" wire:confirm="Delete this branch?" class="btn-icon" style="color: #ef4444; font-size: 0.8rem;">Delete</button>
+                                        <a href="{{ route('subjects.edit', $child) }}" wire:navigate class="btn-icon" style="font-size: 0.8rem;">{{ __('general.edit') }}</a>
+                                        <button wire:click="delete({{ $child->id }})" wire:confirm="{{ __('subjects.delete_confirm') }}" class="btn-icon" style="color: #ef4444; font-size: 0.8rem;">{{ __('general.delete') }}</button>
                                     </div>
                                 </div>
                             </li>
@@ -458,7 +488,7 @@
             @empty
                 <li>
                     <div class="tree-node" style="justify-content: center; padding: 2rem; color: var(--crm-text-muted);">
-                        No subjects defined yet.
+                        {{ __('subjects.no_subjects') }}
                     </div>
                 </li>
             @endforelse
@@ -474,7 +504,7 @@
                     <div class="card-subtitle">{{ $root->name_ar }}</div>
                 </div>
                 @if($root->is_religion_based)
-                    <span class="badge-religion">Religion</span>
+                    <span class="badge-religion">{{ __('general.religion') }}</span>
                 @elseif($root->is_main)
                     <span class="badge-main">Main</span>
                 @else
@@ -484,11 +514,11 @@
             <div class="card-body">
                 <div class="card-row">
                     <span class="card-label">Description</span>
-                    <span class="card-value">{{ $root->description ?? '—' }}</span>
+                    <span class="card-value">{{ $root->description ?? __('general.no_data') }}</span>
                 </div>
                 <div class="card-row">
-                    <span class="card-label">Religion</span>
-                    <span class="card-value">{{ $root->religion ?? '—' }}</span>
+                    <span class="card-label">{{ __('general.religion') }}</span>
+                    <span class="card-value">{{ $root->religion ?? __('general.no_data') }}</span>
                 </div>
                 @if($root->children->count())
                 <div class="branch-list">
@@ -506,7 +536,7 @@
                             @else
                                 <span class="badge-optional">Opt</span>
                             @endif
-                            <a href="{{ route('subjects.edit', $child) }}" wire:navigate class="btn-icon" style="font-size: 0.75rem;">Edit</a>
+                            <a href="{{ route('subjects.edit', $child) }}" wire:navigate class="btn-icon" style="font-size: 0.75rem;">{{ __('general.edit') }}</a>
                         </div>
                     </div>
                     @endforeach
@@ -514,13 +544,13 @@
                 @endif
             </div>
             <div class="card-actions">
-                <a href="{{ route('subjects.edit', $root) }}" wire:navigate class="btn-icon">Edit</a>
-                <button wire:click="delete({{ $root->id }})" wire:confirm="Delete this subject and all its branches?" class="btn-icon" style="color: #ef4444;">Delete</button>
+                <a href="{{ route('subjects.edit', $root) }}" wire:navigate class="btn-icon">{{ __('general.edit') }}</a>
+                <button wire:click="delete({{ $root->id }})" wire:confirm="{{ __('subjects.delete_confirm') }}" class="btn-icon" style="color: #ef4444;">{{ __('general.delete') }}</button>
             </div>
         </div>
         @empty
         <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--crm-text-muted); background: var(--crm-empty-bg, rgba(255,255,255,0.7)); border-radius: 1rem;">
-            No subjects defined yet.
+            {{ __('subjects.no_subjects') }}
         </div>
         @endforelse
     </div>

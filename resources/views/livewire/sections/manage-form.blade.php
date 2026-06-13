@@ -25,22 +25,22 @@
     .crm-container {
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
-        min-height: 100vh; padding: 2rem;
+        min-height: 100vh; padding: 0.75rem 2rem;
     }
     .form-card {
         background: var(--crm-panel-bg);
         backdrop-filter: blur(10px);
         border-radius: 1rem; border: 1px solid var(--crm-panel-border);
-        padding: 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
+        padding: 0.75rem 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         max-width: 560px; margin: 0 auto;
     }
     .form-card h1 {
         font-size: 1.75rem; font-weight: 800; color: var(--crm-text);
-        margin-top: 0; margin-bottom: 1.5rem; letter-spacing: -0.5px;
+        margin-top: 0; margin-bottom: 0.75rem; letter-spacing: -0.5px;
     }
-    .form-group { margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 0.75rem; }
     .form-group label {
-        display: block; margin-bottom: 0.5rem;
+        display: block; margin-bottom: 0.75rem;
         font-weight: 500; color: var(--crm-text-muted); font-size: 0.875rem;
     }
     .form-group input, .form-group select {
@@ -54,9 +54,9 @@
         box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
         background: var(--crm-panel-bg);
     }
-    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; display: block; }
+    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.75rem; display: block; }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
         font-weight: 600; border: none; cursor: pointer;
         box-shadow: 0 4px 6px -1px rgba(99,102,241,0.4);
@@ -70,21 +70,47 @@
         text-decoration: none; display: inline-block;
     }
     .btn-secondary:hover { background: var(--crm-btn-secondary-hover); }
-    .actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; }
+    .actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 0.75rem; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
 </style>
 
     <div class="form-card">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-            <a href="{{ route('sections') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back</a>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <a href="{{ route('sections') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ __('general.back') }}</a>
         </div>
-        <h1>{{ $section ? 'Edit Class' : 'New Class' }}</h1>
+        <h1>{{ $section ? __('sections.edit_class') : __('sections.new_class') }}</h1>
 
         <form wire:submit.prevent="save">
             <div class="form-group">
-                <label>Grade</label>
+                <label>{{ __('general.grade') }}</label>
                 <select wire:model="grade_id">
-                    <option value="">-- Select Grade --</option>
+                    <option value="">{{ __('general.select_grade') }}</option>
                     @foreach($this->grades as $grade)
                         <option value="{{ $grade->id }}">{{ $grade->name }} ({{ $grade->name_ar }})</option>
                     @endforeach
@@ -94,20 +120,20 @@
 
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Name (Latin)</label>
+                    <label>{{ __('sections.name_latin') }}</label>
                     <input type="text" wire:model.blur="name" placeholder="A">
                     @error('name') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Name (Arabic)</label>
+                    <label>{{ __('sections.name_arabic') }}</label>
                     <input type="text" wire:model.blur="name_ar" placeholder="أ" dir="rtl">
                     @error('name_ar') <span class="error">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <div class="actions">
-                <a href="{{ route('sections') }}" wire:navigate class="btn-secondary">Cancel</a>
-                <button type="submit" class="btn-primary">Save</button>
+                <a href="{{ route('sections') }}" wire:navigate class="btn-secondary">{{ __('general.cancel') }}</a>
+                <button type="submit" class="btn-primary">{{ __('general.save') }}</button>
             </div>
         </form>
     </div>

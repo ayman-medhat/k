@@ -25,25 +25,29 @@
     .crm-container {
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
-        min-height: 100vh; padding: 2rem;
+        min-height: 100vh; padding: 0.75rem 2rem;
     }
     .header {
-        margin-bottom: 2rem;
+        margin-bottom: 0.75rem;
+        height: 2.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     .header h1 {
-        font-size: 2.5rem; color: var(--crm-text);
-        margin: 0; font-weight: 800; letter-spacing: -1px;
+        font-size: 1.2rem; color: var(--crm-text);
+        margin: 0; font-weight: 700; letter-spacing: -0.5px;
     }
     .form-card {
         background: var(--crm-panel-bg);
         backdrop-filter: blur(10px);
         border-radius: 1rem; border: 1px solid var(--crm-panel-border);
-        padding: 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
+        padding: 0.75rem 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         max-width: 900px; margin: 0 auto;
     }
-    .form-group { margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 0.75rem; }
     .form-group label {
-        display: block; margin-bottom: 0.5rem;
+        display: block; margin-bottom: 0.75rem;
         font-weight: 500; color: var(--crm-text-muted); font-size: 0.875rem;
     }
     .form-group input, .form-group select, .form-group textarea {
@@ -59,9 +63,9 @@
         background: var(--crm-panel-bg);
     }
     .form-group textarea { min-height: 80px; resize: vertical; }
-    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; display: block; }
+    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.75rem; display: block; }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
         font-weight: 600; border: none; cursor: pointer;
         box-shadow: 0 4px 6px -1px rgba(99,102,241,0.4);
@@ -73,17 +77,43 @@
     .divider { border: none; border-top: 1px solid var(--crm-divider); margin: 1.5rem 0; }
     .section-title {
         font-weight: 700; font-size: 1rem; color: var(--crm-text);
-        margin-bottom: 1rem; margin-top: 0.5rem;
+        margin-bottom: 0.75rem; margin-top: 0.75rem;
     }
     .flash {
         background: #059669; color: white; padding: 0.75rem 1rem;
-        border-radius: 0.5rem; margin-bottom: 1rem;
+        border-radius: 0.5rem; margin-bottom: 0.75rem;
         font-weight: 600; font-size: 0.875rem;
+    }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
     }
 </style>
 
     <div class="header">
-        <h1>School Information</h1>
+        <h1>{{ __('schools.page_title') }}</h1>
     </div>
 
     @if(session('message'))
@@ -95,12 +125,12 @@
             <div class="section-title">🏫 School Name</div>
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Name (English)</label>
+                    <label>{{ __('general.name_en') }}</label>
                     <input type="text" wire:model.blur="nameEn" placeholder="International School of ...">
                     @error('nameEn') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Name (Arabic)</label>
+                    <label>{{ __('general.name_ar') }}</label>
                     <input type="text" wire:model.blur="nameAr" placeholder="المدرسة ..." dir="rtl">
                     @error('nameAr') <span class="error">{{ $message }}</span> @enderror
                 </div>
@@ -109,23 +139,23 @@
             <hr class="divider">
             <div class="section-title">📍 Contact & Address</div>
             <div class="form-group">
-                <label>Address</label>
+                <label>{{ __('schools.address') }}</label>
                 <input type="text" wire:model.blur="address" placeholder="Full address">
                 @error('address') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="grid-3">
                 <div class="form-group">
-                    <label>Phone</label>
+                    <label>{{ __('schools.phone') }}</label>
                     <input type="text" wire:model.blur="phone" placeholder="+20 ...">
                     @error('phone') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
+                    <label>{{ __('schools.email') }}</label>
                     <input type="email" wire:model.blur="email" placeholder="info@school.com">
                     @error('email') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Website</label>
+                    <label>{{ __('schools.website') }}</label>
                     <input type="url" wire:model.blur="website" placeholder="https://...">
                     @error('website') <span class="error">{{ $message }}</span> @enderror
                 </div>
@@ -135,7 +165,7 @@
             <div class="section-title">👤 Administration</div>
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Principal Name</label>
+                    <label>{{ __('schools.principal') }}</label>
                     <input type="text" wire:model.blur="principal_name" placeholder="Dr. ...">
                     @error('principal_name') <span class="error">{{ $message }}</span> @enderror
                 </div>
@@ -146,29 +176,29 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Logo</label>
+                <label>{{ __('schools.logo') }}</label>
                 <div style="display: flex; gap: 0.75rem; align-items: center;">
                     <input type="text" wire:model.blur="logo" placeholder="/storage/school-logos/..." style="flex: 1;" readonly>
-                    <label for="logoUpload" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 0.6rem 1.25rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; white-space: nowrap; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(99,102,241,0.3);" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Browse</label>
+                    <label for="logoUpload" style="background: var(--crm-btn-primary-bg); color: white; padding: 0.6rem 1.25rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; white-space: nowrap; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(99,102,241,0.3);" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Browse</label>
                     <input type="file" id="logoUpload" wire:model="logoFile" accept="image/jpg,image/jpeg,image/png,image/webp,image/gif" style="display: none;">
                 </div>
                 @if($logoFile)
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #059669;">✓ {{ $logoFile->getClientOriginalName() }} selected</div>
+                <div style="margin-top: 0.75rem; font-size: 0.8rem; color: #059669;">✓ {{ $logoFile->getClientOriginalName() }} {{ __('general.selected') }}</div>
                 @endif
                 @error('logoFile') <span class="error">{{ $message }}</span> @enderror
                 @error('logo') <span class="error">{{ $message }}</span> @enderror
             </div>
 
             <hr class="divider">
-            <div class="section-title">🎯 Mission & Vision</div>
+            <div class="section-title">{{ __('welcome.mission_vision') }}</div>
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Mission</label>
+                    <label>{{ __('welcome.our_mission') }}</label>
                     <textarea wire:model.blur="mission" placeholder="Our mission is..."></textarea>
                     @error('mission') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Vision</label>
+                    <label>{{ __('welcome.our_vision') }}</label>
                     <textarea wire:model.blur="vision" placeholder="Our vision is..."></textarea>
                     @error('vision') <span class="error">{{ $message }}</span> @enderror
                 </div>
@@ -199,8 +229,8 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
-                <button type="submit" class="btn-primary">{{ $school ? 'Update' : 'Save' }} School Info</button>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 0.75rem;">
+                <button type="submit" class="btn-primary">{{ __('schools.save') }}</button>
             </div>
         </form>
     </div>

@@ -7,8 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Contact extends Model
 {
     protected $fillable = [
-        'nameEn', 'nameAr', 'email', 'phone', 'nationality', 'religion', 'gender', 'categories',
-        'national_id', 'passport_no', 'birth_date', 'status', 'source', 'notes', 'parent_id', 'mother_id',
+        'nameEn', 'nameAr', 'email', 'phone',
+        'nationality', 'nationality_ar',
+        'religion', 'religion_ar',
+        'gender', 'gender_ar',
+        'categories',
+        'national_id', 'passport_no', 'birth_date',
+        'status', 'status_ar',
+        'source', 'source_ar',
+        'notes', 'notes_ar',
+        'photo',
+        'parent_id', 'mother_id',
     ];
 
     protected function casts(): array
@@ -22,6 +31,11 @@ class Contact extends Model
     public function interactions()
     {
         return $this->hasMany(Interaction::class, 'contact_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(ContactDocument::class);
     }
 
     public function parent()

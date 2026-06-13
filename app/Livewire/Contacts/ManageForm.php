@@ -2,32 +2,58 @@
 
 namespace App\Livewire\Contacts;
 
+use App\Helpers\ArabicTransliterator;
 use App\Models\Contact;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Persist;
+use Livewire\WithFileUploads;
+use App\Models\ContactDocument;
 
 #[Layout('layouts.app')]
 class ManageForm extends Component
 {
+    use WithFileUploads;
+
     public ?Contact $contact = null;
 
+    #[Persist]
     public $nameEn = '';
+    #[Persist]
     public $nameAr = '';
+    #[Persist]
     public $email = '';
+    #[Persist]
     public $phone = '';
+    #[Persist]
     public $nationality = 'Egyptian';
+    #[Persist]
     public $religion = '';
+    #[Persist]
     public $gender = '';
+    #[Persist]
     public $national_id = '';
+    #[Persist]
     public $passport_no = '';
+    #[Persist]
     public $status = 'Active';
+    #[Persist]
     public $categories = ['Parent'];
+    #[Persist]
     public $parent_id = null;
+    #[Persist]
     public $mother_id = null;
+
+    public $photo = null;
+    public $documents = [];
+    public $documentNotes = [];
 
     public $creatingMotherForStudent = false;
     public $savedStudentState = [];
+
+    public bool $showDuplicateModal = false;
+    public ?Contact $existingDuplicate = null;
 
     public function mount(?Contact $contact = null)
     {
@@ -47,6 +73,26 @@ class ManageForm extends Component
             $this->categories = $contact->categories ?? ['Parent'];
             $this->parent_id = $contact->parent_id;
             $this->mother_id = $contact->mother_id;
+            $this->photo = $contact->photo;
+        }
+    }
+
+    public function removeDocument($index)
+    {
+        if (isset($this->documents[$index])) {
+            unset($this->documents[$index]);
+            $this->documents = array_values($this->documents);
+            unset($this->documentNotes[$index]);
+            $this->documentNotes = array_values($this->documentNotes);
+        }
+    }
+
+    public function deleteExistingDocument($docId)
+    {
+        $doc = ContactDocument::findOrFail($docId);
+        if ($this->contact && $doc->contact_id === $this->contact->id) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($doc->file_path);
+            $doc->delete();
         }
     }
 
@@ -60,11 +106,14 @@ class ManageForm extends Component
             'nationality' => 'required|string',
             'religion' => 'nullable|string|in:Muslim,Christian',
             'gender' => 'nullable|string|in:Male,Female',
-            'national_id' => $this->nationality === 'Egyptian' ? 'required|digits:14|unique:contacts,national_id' . ($this->contact?->id ? ',' . $this->contact->id : '') : 'nullable',
+            'national_id' => $this->nationality === 'Egyptian' ? 'required|digits:14' : 'nullable',
             'passport_no' => $this->nationality !== 'Egyptian' ? 'required|string' : 'nullable',
             'status' => 'required|string',
             'categories' => 'required|array|min:1',
             'categories.*' => 'string|in:' . implode(',', $this->allowedCategoryOptions()),
+            'photo' => $this->photo && is_object($this->photo) ? 'nullable|image|max:2048' : 'nullable',
+            'documents.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'documentNotes.*' => 'nullable|string|max:255',
             'parent_id' => 'nullable|exists:contacts,id',
             'mother_id' => 'nullable|exists:contacts,id',
         ];
@@ -100,6 +149,13 @@ class ManageForm extends Component
         };
     }
 
+    public function translateName()
+    {
+        if ($this->nameAr) {
+            $this->nameEn = ArabicTransliterator::toLatin($this->nameAr);
+        }
+    }
+
     public function startCreatingMother()
     {
         $this->savedStudentState = [
@@ -115,6 +171,7 @@ class ManageForm extends Component
             'status' => $this->status,
             'categories' => $this->categories,
             'parent_id' => $this->parent_id,
+            'photo' => $this->photo,
         ];
 
         $this->nameEn = '';
@@ -141,7 +198,7 @@ class ManageForm extends Component
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
             'nationality' => 'required|string',
-            'national_id' => $this->nationality === 'Egyptian' ? 'required|digits:14|unique:contacts,national_id' : 'nullable',
+            'national_id' => $this->nationality === 'Egyptian' ? 'required|digits:14' : 'nullable',
             'passport_no' => $this->nationality !== 'Egyptian' ? 'required|string' : 'nullable',
         ]);
 
@@ -177,6 +234,7 @@ class ManageForm extends Component
         $this->categories = $saved['categories'];
         $this->parent_id = $saved['parent_id'];
         $this->mother_id = $newMother->id;
+        $this->photo = $saved['photo'] ?? null;
         $this->savedStudentState = [];
         $this->creatingMotherForStudent = false;
         $this->resetValidation();
@@ -198,6 +256,7 @@ class ManageForm extends Component
         $this->status = $saved['status'];
         $this->categories = $saved['categories'];
         $this->parent_id = $saved['parent_id'];
+        $this->photo = $saved['photo'] ?? null;
         $this->savedStudentState = [];
         $this->creatingMotherForStudent = false;
         $this->resetValidation();
@@ -224,6 +283,64 @@ class ManageForm extends Component
     {
         $this->validate();
 
+        if ($this->nationality === 'Egyptian' && $this->national_id) {
+            $existing = Contact::where('national_id', $this->national_id)
+                ->when($this->contact, fn($q) => $q->where('id', '!=', $this->contact->id))
+                ->first();
+
+            if ($existing) {
+                $this->existingDuplicate = $existing;
+                $this->showDuplicateModal = true;
+                return;
+            }
+        }
+
+        $this->performSave();
+    }
+
+    public function confirmUpdateExisting()
+    {
+        if (!$this->existingDuplicate) {
+            $this->showDuplicateModal = false;
+            return;
+        }
+
+        $this->validate();
+
+        $data = $this->buildSaveData();
+        if ($this->photo && is_object($this->photo)) {
+            $data['photo'] = $this->photo->store('photos', 'public');
+        }
+        $this->existingDuplicate->update($data);
+
+        foreach ($this->documents as $i => $doc) {
+            if ($doc) {
+                $path = $doc->store('contact-documents', 'public');
+                $this->existingDuplicate->documents()->create([
+                    'file_path' => $path,
+                    'file_name' => $doc->getClientOriginalName(),
+                    'file_type' => $doc->getMimeType(),
+                    'notes' => $this->documentNotes[$i] ?? null,
+                ]);
+            }
+        }
+
+        $this->showDuplicateModal = false;
+        $this->existingDuplicate = null;
+
+        $this->redirect(route('contacts'), navigate: true);
+    }
+
+    public function ignoreDuplicate()
+    {
+        $this->showDuplicateModal = false;
+        $this->existingDuplicate = null;
+
+        $this->redirect(route('contacts'), navigate: true);
+    }
+
+    protected function buildSaveData(): array
+    {
         $isStudent = in_array('Student', $this->categories);
 
         $data = [
@@ -240,6 +357,10 @@ class ManageForm extends Component
             'mother_id' => $isStudent ? $this->mother_id : null,
         ];
 
+        if ($this->photo) {
+            $data['photo'] = $this->photo;
+        }
+
         if ($this->nationality === 'Egyptian') {
             $data['national_id'] = $this->national_id;
             $data['passport_no'] = null;
@@ -248,10 +369,34 @@ class ManageForm extends Component
             $data['national_id'] = null;
         }
 
+        return $data;
+    }
+
+    protected function performSave(): void
+    {
+        $data = $this->buildSaveData();
+
+        if ($this->photo && is_object($this->photo)) {
+            $data['photo'] = $this->photo->store('photos', 'public');
+        }
+
         if ($this->contact) {
             $this->contact->update($data);
+            $contact = $this->contact;
         } else {
-            Contact::create($data);
+            $contact = Contact::create($data);
+        }
+
+        foreach ($this->documents as $i => $doc) {
+            if ($doc) {
+                $path = $doc->store('contact-documents', 'public');
+                $contact->documents()->create([
+                    'file_path' => $path,
+                    'file_name' => $doc->getClientOriginalName(),
+                    'file_type' => $doc->getMimeType(),
+                    'notes' => $this->documentNotes[$i] ?? null,
+                ]);
+            }
         }
 
         $this->redirect(route('contacts'), navigate: true);

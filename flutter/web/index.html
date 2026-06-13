@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Kashmos International School Management System">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kashmos School</title>
+  <style>
+    #dbg { position: fixed; bottom: 0; left: 0; right: 0; z-index: 99999; background: #000; color: #0f0; font-family: monospace; font-size: 11px; padding: 4px; max-height: 300px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
+  </style>
+  <script>
+    window.__allLogs = [];
+    function cap(fn) { return function() { var args = Array.from(arguments).map(function(a) { try { return typeof a === 'object' ? JSON.stringify(a) : String(a); } catch(e) { return String(a); } }).join(' '); window.__allLogs.push(args); if (window.__allLogs.length > 500) window.__allLogs.shift(); var el = document.getElementById('dbg'); if (el) { el.textContent = window.__allLogs.join('\n'); } return fn.apply(console, arguments); }; }
+    console.log = cap(console.log);
+    console.warn = cap(console.warn);
+    console.error = cap(console.error);
+    console.debug = cap(console.debug);
+    window.onerror = function(msg, url, line, col, err) { var s = (err && err.stack) || String(msg); window.__allLogs.push('JS_ERROR: ' + s); var el = document.getElementById('dbg'); if (el) el.textContent = window.__allLogs.join('\n'); return false; };
+    window.addEventListener('unhandledrejection', function(ev) { window.__allLogs.push('UNHANDLED: ' + (ev.reason && (ev.reason.stack || String(ev.reason)))); var el = document.getElementById('dbg'); if (el) el.textContent = window.__allLogs.join('\n'); });
+  </script>
+</head>
+<body>
+  <pre id="dbg">Loading Flutter...</pre>
+  <script src="flutter.js" defer></script>
+  <script src="flutter_bootstrap.js" defer></script>
+</body>
+</html>

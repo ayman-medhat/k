@@ -25,22 +25,22 @@
     .crm-container {
         font-family: 'Inter', system-ui, sans-serif;
         background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
-        min-height: 100vh; padding: 2rem;
+        min-height: 100vh; padding: 0.75rem 2rem;
     }
     .form-card {
         background: var(--crm-panel-bg);
         backdrop-filter: blur(10px);
         border-radius: 1rem; border: 1px solid var(--crm-panel-border);
-        padding: 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
+        padding: 0.75rem 2rem; box-shadow: 0 20px 25px -5px var(--crm-panel-shadow);
         max-width: 720px; margin: 0 auto;
     }
     .form-card h1 {
         font-size: 1.75rem; font-weight: 800; color: var(--crm-text);
-        margin-top: 0; margin-bottom: 1.5rem; letter-spacing: -0.5px;
+        margin-top: 0; margin-bottom: 0.75rem; letter-spacing: -0.5px;
     }
-    .form-group { margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 0.75rem; }
     .form-group label {
-        display: block; margin-bottom: 0.5rem;
+        display: block; margin-bottom: 0.75rem;
         font-weight: 500; color: var(--crm-text-muted); font-size: 0.875rem;
     }
     .form-group input, .form-group select {
@@ -58,9 +58,9 @@
         background: var(--crm-btn-secondary-bg);
         cursor: not-allowed;
     }
-    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; display: block; }
+    .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.75rem; display: block; }
     .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: var(--crm-btn-primary-bg);
         color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
         font-weight: 600; border: none; cursor: pointer;
         box-shadow: 0 4px 6px -1px rgba(99,102,241,0.4);
@@ -74,20 +74,46 @@
         text-decoration: none; display: inline-block;
     }
     .btn-secondary:hover { background: var(--crm-btn-secondary-hover); }
-    .actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; }
+    .actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 0.75rem; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
     .divider { border: none; border-top: 1px solid var(--crm-divider); margin: 1rem 0; }
+    /* Standard height for all buttons and search boxes */
+    .btn-primary, .btn-secondary, .btn-danger, .btn-danger-sm {
+        height: 2.25rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box {
+        height: 2.25rem;
+        padding: 0.15rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid var(--crm-input-border);
+        background: var(--crm-input-bg);
+        color: var(--crm-text);
+        font-size: 0.875rem;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .search-box:focus {
+        border-color: var(--crm-input-focus-border);
+        box-shadow: 0 0 0 3px var(--crm-input-focus-ring);
+    }
 </style>
 
     <div class="form-card">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-            <a href="{{ route('students') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">← Back</a>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <a href="{{ route('students') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ __('general.back') }}</a>
         </div>
-        <h1>{{ $student ? 'Edit Student' : 'New Student' }}</h1>
+        <h1>{{ $student ? __('students.edit_student') : __('students.new_student') }}</h1>
 
         @if($isControl)
-        <div style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fde68a; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 0.875rem; color: #92400e; display: flex; align-items: center; gap: 0.5rem;">
+        <div style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fde68a; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem; font-size: 0.875rem; color: #92400e; display: flex; align-items: center; gap: 0.5rem;">
             <span>🔒</span>
             <span><strong>Control Mode</strong> — You can only modify Seat No. and Secret Code.</span>
         </div>
@@ -97,7 +123,7 @@
             <div class="form-group">
                 <label>Select Student Contact</label>
                 <select wire:model.live="contact_id" {{ $isControl ? 'disabled' : '' }}>
-                    <option value="">-- Choose Contact --</option>
+                    <option value="">{{ __('general.select') }}</option>
                     @foreach($this->availableContacts as $c)
                         <option value="{{ $c->id }}">{{ $c->nameEn }} ({{ $c->nameAr }})</option>
                     @endforeach
@@ -109,7 +135,7 @@
                 <div class="form-group">
                 <label>Select Grade</label>
                 <select wire:model.live="grade_id" {{ $isControl ? 'disabled' : '' }}>
-                        <option value="">-- Choose Grade --</option>
+                        <option value="">{{ __('general.select_grade') }}</option>
                         @foreach($this->availableGrades as $g)
                             <option value="{{ $g->id }}">{{ $g->name }} ({{ $g->name_ar }})</option>
                         @endforeach
@@ -119,7 +145,7 @@
                 <div class="form-group">
                 <label>Select Class</label>
                 <select wire:model="section_id" {{ $isControl ? 'disabled' : '' }}>
-                        <option value="">-- Choose Class --</option>
+                        <option value="">{{ __('general.select') }}</option>
                         @foreach($this->availableSections as $s)
                             <option value="{{ $s->id }}">{{ $s->name }} ({{ $s->name_ar }})</option>
                         @endforeach
@@ -133,7 +159,7 @@
             <div class="form-group">
                 <label>Second Language</label>
                 <select wire:model="second_language_id" {{ $isControl ? 'disabled' : '' }}>
-                    <option value="">-- Choose Language --</option>
+                    <option value="">{{ __('general.select') }}</option>
                     @foreach($langOpts as $lang)
                         <option value="{{ $lang->id }}">{{ $lang->name }} ({{ $lang->name_ar }})</option>
                     @endforeach
@@ -168,9 +194,9 @@
 
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Father</label>
+                    <label>{{ __('general.father') }}</label>
                     <select wire:model="father_id" {{ $isControl ? 'disabled' : '' }}>
-                        <option value="">-- Choose Father --</option>
+                    <option value="">{{ __('general.select_father') }}</option>
                         @foreach($this->availableFathers as $f)
                             <option value="{{ $f->id }}">{{ $f->nameEn }} ({{ $f->nameAr }})</option>
                         @endforeach
@@ -178,9 +204,9 @@
                     @error('father_id') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="form-group">
-                    <label>Mother</label>
+                    <label>{{ __('general.mother') }}</label>
                     <select wire:model="mother_id" {{ $isControl ? 'disabled' : '' }}>
-                        <option value="">-- Choose Mother --</option>
+                        <option value="">{{ __('general.select_mother') }}</option>
                         @foreach($this->availableMothers as $m)
                             <option value="{{ $m->id }}">{{ $m->nameEn }} ({{ $m->nameAr }})</option>
                         @endforeach
@@ -192,9 +218,9 @@
             <div class="form-group">
                 <label>Guardian</label>
                 <select wire:model="guardian" {{ $isControl ? 'disabled' : '' }}>
-                    <option value="father">Father</option>
-                    <option value="mother">Mother</option>
-                    <option value="other">Other</option>
+                    <option value="father">{{ __('general.father') }}</option>
+                    <option value="mother">{{ __('general.mother') }}</option>
+                    <option value="other">{{ __('general.other') }}</option>
                 </select>
                 @error('guardian') <span class="error">{{ $message }}</span> @enderror
             </div>
@@ -210,25 +236,25 @@
                     </div>
                     @error('photo') <span class="error">{{ $message }}</span> @enderror
                     @if($photo)
-                        <div style="margin-top: 0.5rem;">
+                        <div style="margin-top: 0.75rem;">
                             <img src="{{ $photo->temporaryUrl() }}" style="max-width: 120px; border-radius: 0.5rem; border: 1px solid var(--crm-input-border);">
                         </div>
                     @elseif($existingPhoto)
-                        <div style="margin-top: 0.5rem;">
+                        <div style="margin-top: 0.75rem;">
                             <img src="{{ Storage::url($existingPhoto) }}" style="max-width: 120px; border-radius: 0.5rem; border: 1px solid var(--crm-input-border);">
                         </div>
                     @endif
                 </div>
                 <div class="form-group">
-                    <label>Age at 1st October</label>
-                    <input type="text" readonly value="{{ $ageFormatted ?: 'Auto-calculated' }}" placeholder="Auto-calculated from birth date">
+                    <label>{{ __('general.age_at_oct') }}</label>
+                    <input type="text" readonly value="{{ $ageFormatted ?: __('general.auto_calculated') }}" placeholder="{{ __('general.age_birth_auto') }}">
                     <small style="color: var(--crm-text-muted); font-size: 0.75rem;">Calculated automatically when a contact is selected.</small>
                 </div>
             </div>
 
             <div class="actions">
-                <a href="{{ route('students') }}" wire:navigate class="btn-secondary">Cancel</a>
-                <button type="submit" class="btn-primary">Save</button>
+                <a href="{{ route('students') }}" wire:navigate class="btn-secondary">{{ __('general.cancel') }}</a>
+                <button type="submit" class="btn-primary">{{ __('general.save') }}</button>
             </div>
         </form>
     </div>

@@ -2,47 +2,77 @@
 
 namespace App\Livewire\Leads;
 
+use App\Helpers\ArabicTransliterator;
+use App\Models\Grade;
 use App\Models\Lead;
 use App\Models\Student;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Persist;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.app')]
 class ManageForm extends Component
 {
+    use WithFileUploads;
+
     public ?Lead $lead = null;
 
+    #[Persist]
     public $nameEn = '';
 
+    #[Persist]
     public $nameAr = '';
 
+    #[Persist]
     public $email = '';
 
+    #[Persist]
     public $phone = '';
 
+    #[Persist]
     public $nationality = 'Egyptian';
 
+    #[Persist]
     public $religion = '';
 
+    #[Persist]
     public $gender = '';
 
+    #[Persist]
     public $national_id = '';
 
+    #[Persist]
     public $passport_no = '';
 
+    #[Persist]
     public $status = 'New';
+    #[Persist]
     public $categories = ['Parent'];
+    #[Persist]
     public $parent_id = null;
+    #[Persist]
     public $mother_id = null;
+
+    public $photo = null;
+
+    #[Persist]
     public $birth_date = '';
+    #[Persist]
     public $ageFormatted = '';
 
     public $creatingParentForStudent = false;
     public $creatingMotherForStudent = false;
     public $savedStudentState = [];
 
+    #[Persist]
+    public $grade_id = null;
+
     public $readOnly = false;
+
+    public bool $showDuplicateModal = false;
+    public ?Lead $existingDuplicate = null;
 
     public function mount(?Lead $lead = null)
     {
@@ -70,6 +100,8 @@ class ManageForm extends Component
             $this->ageFormatted = $lead->birth_date
                 ? Student::formatAgeAtOctober($lead->birth_date->format('Y-m-d')) ?? ''
                 : '';
+            $this->grade_id = $lead->grade_id;
+            $this->photo = $lead->photo;
         }
     }
 
@@ -88,6 +120,7 @@ class ManageForm extends Component
             'status' => 'required|string',
             'categories' => 'required|array|min:1',
             'categories.*' => 'string|in:' . implode(',', $this->allowedCategoryOptions()),
+            'photo' => $this->photo && is_object($this->photo) ? 'nullable|image|max:2048' : 'nullable',
             'parent_id' => 'nullable|exists:leads,id',
             'mother_id' => 'nullable|exists:leads,id',
         ];
@@ -104,6 +137,12 @@ class ManageForm extends Component
             'control' => ['Student'],
             default => ['Parent', 'Student', 'Employee', 'Supplier', 'Partner', 'Owner'],
         };
+    }
+
+    #[Computed]
+    public function availableGrades()
+    {
+        return Grade::orderBy('name')->get(['id', 'name']);
     }
 
     #[Computed]
@@ -155,6 +194,8 @@ class ManageForm extends Component
             'status' => $this->status,
             'categories' => $this->categories,
             'mother_id' => $this->mother_id,
+            'grade_id' => $this->grade_id,
+            'photo' => $this->photo,
         ];
 
         $this->nameEn = '';
@@ -167,6 +208,8 @@ class ManageForm extends Component
         $this->status = 'New';
         $this->mother_id = null;
         $this->categories = ['Parent'];
+        $this->grade_id = null;
+        $this->photo = null;
         $this->resetValidation();
 
         $this->creatingParentForStudent = true;
@@ -211,11 +254,9 @@ class ManageForm extends Component
         $this->status = $saved['status'];
         $this->categories = $saved['categories'];
         $this->mother_id = $saved['mother_id'];
-        $this->parent_id = $newParent->id;
+        $this->grade_id = $saved['grade_id'] ?? null;
         $this->savedStudentState = [];
-        $this->creatingParentForStudent = false;
-        $this->resetValidation();
-        unset($this->availableParents);
+
     }
 
     public function cancelParentCreation()
@@ -233,6 +274,8 @@ class ManageForm extends Component
         $this->status = $saved['status'];
         $this->categories = $saved['categories'];
         $this->mother_id = $saved['mother_id'];
+        $this->grade_id = $saved['grade_id'] ?? null;
+        $this->photo = $saved['photo'] ?? null;
         $this->savedStudentState = [];
         $this->creatingParentForStudent = false;
         $this->creatingMotherForStudent = false;
@@ -254,6 +297,8 @@ class ManageForm extends Component
             'status' => $this->status,
             'categories' => $this->categories,
             'parent_id' => $this->parent_id,
+            'grade_id' => $this->grade_id,
+            'photo' => $this->photo,
         ];
 
         $this->nameEn = '';
@@ -267,6 +312,7 @@ class ManageForm extends Component
         $this->parent_id = null;
         $this->categories = ['Parent'];
         $this->gender = 'Female';
+        $this->photo = null;
         $this->resetValidation();
 
         $this->creatingMotherForStudent = true;
@@ -313,10 +359,19 @@ class ManageForm extends Component
         $this->categories = $saved['categories'];
         $this->parent_id = $saved['parent_id'];
         $this->mother_id = $newMother->id;
+        $this->grade_id = $saved['grade_id'] ?? null;
+        $this->photo = $saved['photo'] ?? null;
         $this->savedStudentState = [];
         $this->creatingMotherForStudent = false;
         $this->resetValidation();
         unset($this->availableMothers);
+    }
+
+    public function translateName()
+    {
+        if ($this->nameAr) {
+            $this->nameEn = ArabicTransliterator::toLatin($this->nameAr);
+        }
     }
 
     public function updatedBirthDate()
@@ -324,6 +379,103 @@ class ManageForm extends Component
         $this->ageFormatted = $this->birth_date
             ? Student::formatAgeAtOctober($this->birth_date) ?? ''
             : '';
+    }
+
+    public function save()
+    {
+        $this->validate();
+
+        if ($this->nationality === 'Egyptian' && $this->national_id) {
+            $existing = Lead::where('national_id', $this->national_id)
+                ->when($this->lead, fn($q) => $q->where('id', '!=', $this->lead->id))
+                ->first();
+
+            if ($existing) {
+                $this->existingDuplicate = $existing;
+                $this->showDuplicateModal = true;
+                return;
+            }
+        }
+
+        $this->performSave();
+    }
+
+    public function confirmUpdateExisting()
+    {
+        if (!$this->existingDuplicate) {
+            $this->showDuplicateModal = false;
+            return;
+        }
+
+        $this->validate();
+
+        $data = $this->buildSaveData();
+        if ($this->photo && is_object($this->photo)) {
+            $data['photo'] = $this->photo->store('photos', 'public');
+        }
+        $this->existingDuplicate->update($data);
+        $this->showDuplicateModal = false;
+        $this->existingDuplicate = null;
+
+        $this->redirect(route('leads'), navigate: true);
+    }
+
+    public function ignoreDuplicate()
+    {
+        $this->showDuplicateModal = false;
+        $this->existingDuplicate = null;
+
+        $this->redirect(route('leads'), navigate: true);
+    }
+
+    protected function buildSaveData(): array
+    {
+        $data = [
+            'nameEn' => $this->nameEn,
+            'nameAr' => $this->nameAr,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'nationality' => $this->nationality,
+            'religion' => $this->religion ?: null,
+            'gender' => $this->gender ?: null,
+            'status' => $this->status,
+            'categories' => $this->categories,
+            'parent_id' => $this->parent_id,
+            'mother_id' => $this->mother_id,
+            'birth_date' => $this->birth_date ?: null,
+            'grade_id' => in_array('Student', $this->categories) ? $this->grade_id : null,
+        ];
+
+        if ($this->photo) {
+            $data['photo'] = $this->photo;
+        }
+
+        return $data;
+    }
+
+    protected function performSave(): void
+    {
+        $data = $this->buildSaveData();
+
+        if ($this->nationality === 'Egyptian') {
+            $data['national_id'] = $this->national_id;
+            $data['passport_no'] = null;
+        } else {
+            $data['passport_no'] = $this->passport_no;
+            $data['national_id'] = null;
+        }
+
+        if ($this->photo && is_object($this->photo)) {
+            $data['photo'] = $this->photo->store('photos', 'public');
+        }
+
+        if ($this->lead) {
+            $this->lead->update($data);
+        } else {
+            Lead::create($data);
+        }
+
+        $this->redirect(route('leads'), navigate: true);
     }
 
     public function render()

@@ -35,7 +35,8 @@ class ManageForm extends Component
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email' . ($this->user?->id ? ',' . $this->user->id : ''),
-            'role' => 'required|string|in:admin,hr,student_affairs,academic,control',
+            // Added parent and student roles for self-registration and LMS prep
+            'role' => 'required|string|in:admin,hr,student_affairs,academic,control,parent,student',
         ];
 
         if ($this->user) {

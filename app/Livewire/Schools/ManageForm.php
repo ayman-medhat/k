@@ -83,10 +83,12 @@ class ManageForm extends Component
             $data['logo'] = '/storage/' . $path;
         }
 
+        $this->school = School::first();
+
         if ($this->school) {
             $this->school->update($data);
         } else {
-            School::create($data);
+            $this->school = School::create($data);
         }
 
         session()->flash('message', 'School information saved successfully.');

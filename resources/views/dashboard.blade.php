@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="crm-container" style="font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%); min-height: calc(100vh - 4rem); padding: 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1 style="font-size: 2.5rem; color: var(--crm-text); margin: 0; font-weight: 800; letter-spacing: -1px;">Dashboard</h1>
+            <h1 style="font-size: 2.5rem; color: var(--crm-text); margin: 0; font-weight: 800; letter-spacing: -1px;">{{ __('nav.dashboard') }}</h1>
         </div>
 
         <div class="max-w-7xl mx-auto">

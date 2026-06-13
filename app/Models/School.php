@@ -23,4 +23,13 @@ class School extends Model
         'social_linkedin',
         'established_year',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function ($school) {
+            if (static::count() > 0) {
+                return false;
+            }
+        });
+    }
 }
