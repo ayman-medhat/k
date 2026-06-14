@@ -35,7 +35,7 @@ new #[Layout('layouts.guest')] class extends Component
         Auth::login($user);
 
         // Redirect to parent dashboard instead of the default home
-        $this->redirect(route('parent.dashboard', absolute: false), navigate: true);
+        $this->redirect(route('parent.dashboard', absolute: false));
     }
 }; ?>
 

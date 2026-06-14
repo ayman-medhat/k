@@ -106,11 +106,18 @@ class ManageForm extends Component
             'nationality' => 'required|string',
             'religion' => 'nullable|string|in:Muslim,Christian',
             'gender' => 'nullable|string|in:Male,Female',
-            'national_id' => $this->nationality === 'Egyptian' ? 'required|digits:14' : 'nullable',
-            'passport_no' => $this->nationality !== 'Egyptian' ? 'required|string' : 'nullable',
+            'national_id' => $this->nationality === 'Egyptian'
+                ? 'nullable|digits:14|unique:contacts,national_id' . ($this->contact ? ',' . $this->contact->id : '')
+                : 'nullable',
+            'passport_no' => $this->nationality !== 'Egyptian'
+                ? 'nullable|string|unique:contacts,passport_no' . ($this->contact ? ',' . $this->contact->id : '')
+                : 'nullable',
             'status' => 'required|string',
             'categories' => 'required|array|min:1',
-            'categories.*' => 'string|in:' . implode(',', $this->allowedCategoryOptions()),
+            'categories.*' => 'string|in:' . implode(',', array_unique(array_merge(
+                $this->allowedCategoryOptions(),
+                $this->contact ? ($this->contact->categories ?? []) : []
+            ))),
             'photo' => $this->photo && is_object($this->photo) ? 'nullable|image|max:2048' : 'nullable',
             'documents.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'documentNotes.*' => 'nullable|string|max:255',

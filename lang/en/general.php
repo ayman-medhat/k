@@ -9,6 +9,7 @@ return [
     'search' => 'Search',
     'import' => 'Import',
     'export' => 'Export',
+    'translate_all' => 'Translate All',
     'list' => 'List',
     'cards' => 'Cards',
     'actions' => 'Actions',

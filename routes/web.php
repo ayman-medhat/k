@@ -95,6 +95,56 @@ Route::get('contacts/import/template', function () {
     }, 'contacts-import-template.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
 })->middleware(['auth', 'verified'])->name('contacts.import.template');
 
+Route::get('contacts/export', function () {
+    $contacts = \App\Models\Contact::with('parent', 'mother', 'student.grade')
+        ->orderBy('nameEn')
+        ->get();
+
+    $filename = 'contacts-' . now()->format('Y-m-d') . '.xlsx';
+
+    return response()->stream(function () use ($contacts) {
+        $writer = new \OpenSpout\Writer\XLSX\Writer;
+        $writer->openToFile('php://output');
+
+        $headerRow = \OpenSpout\Common\Entity\Row::fromValues([
+            'Name (EN)', 'Name (AR)', 'Email', 'Phone',
+            'Nationality', 'Religion', 'Gender', 'Categories',
+            'National ID', 'Passport No', 'Birth Date',
+            'Status', 'Source', 'Notes',
+            'Parent Name', 'Mother Name', 'Grade',
+        ]);
+        $writer->addRow($headerRow);
+
+        foreach ($contacts as $contact) {
+            $row = \OpenSpout\Common\Entity\Row::fromValues([
+                $contact->nameEn,
+                $contact->nameAr,
+                $contact->email,
+                $contact->phone,
+                $contact->nationality,
+                $contact->religion,
+                $contact->gender,
+                is_array($contact->categories) ? implode(', ', $contact->categories) : $contact->categories,
+                $contact->national_id,
+                $contact->passport_no,
+                $contact->birth_date?->format('Y-m-d'),
+                $contact->status,
+                $contact->source,
+                $contact->notes,
+                $contact->parent ? ($contact->parent->nameEn . ' / ' . $contact->parent->nameAr) : '',
+                $contact->mother ? ($contact->mother->nameEn . ' / ' . $contact->mother->nameAr) : '',
+                $contact->student?->grade?->name ?? '',
+            ]);
+            $writer->addRow($row);
+        }
+
+        $writer->close();
+    }, 200, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    ]);
+})->middleware(['auth', 'verified'])->name('contacts.export');
+
 Route::get('grades', \App\Livewire\Grades\Manage::class)
     ->middleware(['auth', 'verified'])
     ->name('grades');

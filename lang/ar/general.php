@@ -8,6 +8,7 @@ return [
     'search' => 'بحث',
     'import' => 'استيراد',
     'export' => 'تصدير',
+    'translate_all' => 'ترجمة الكل',
     'list' => 'قائمة',
     'cards' => 'بطاقات',
     'actions' => 'إجراءات',

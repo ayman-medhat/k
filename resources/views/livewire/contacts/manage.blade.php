@@ -526,6 +526,12 @@
     }
 </style>
 
+    @if($message)
+    <div style="background: #059669; color: white; padding: 0.75rem 1rem; border-radius: 0.75rem; margin-bottom: 0.75rem; font-weight: 600;">
+        {{ $message }}
+    </div>
+    @endif
+
     <div class="header">
         <h1>{{ __('contacts.page_title') }}</h1>
         <input
@@ -547,6 +553,8 @@
                 </button>
             </div>
             <a href="{{ route('contacts.import') }}" wire:navigate class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.import') }}</a>
+            <button wire:click="translateAllNames" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.translate_all') }}</button>
+            <a href="{{ route('contacts.export') }}" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.export') }}</a>
             <a href="{{ route('contacts.create') }}" wire:navigate class="btn-primary">{{ __('contacts.add_new') }}</a>
         </div>
     </div>

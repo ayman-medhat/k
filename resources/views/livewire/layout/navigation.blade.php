@@ -12,7 +12,7 @@ new class extends Component
     public function logout(Logout $logout): void
     {
         $logout();
-        $this->redirect('/', navigate: true);
+        $this->redirect('/');
     }
 
     public function setTheme(string $theme): void

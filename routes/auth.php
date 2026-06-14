@@ -13,6 +13,28 @@ Route::middleware('guest')->group(function () {
     Volt::route('login', 'pages.auth.login')
         ->name('login');
 
+    Route::post('login', function (\Illuminate\Http\Request $request) {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (\Illuminate\Support\Facades\Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $defaultRoute = $user->isParent()
+                ? route('parent.dashboard')
+                : route('dashboard');
+
+            return redirect()->intended($defaultRoute);
+        }
+
+        return back()->withErrors([
+            'email' => __('auth.failed'),
+        ])->onlyInput('email');
+    })->middleware(['guest', 'throttle:5,1']);
+
     Volt::route('forgot-password', 'pages.auth.forgot-password')
         ->name('password.request');
 

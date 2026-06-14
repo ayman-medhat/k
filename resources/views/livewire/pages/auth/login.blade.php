@@ -24,7 +24,7 @@ new #[Layout('layouts.guest')] class extends Component
             ? route('parent.dashboard', absolute: false)
             : route('dashboard', absolute: false);
 
-        $this->redirectIntended(default: $defaultRoute, navigate: true);
+        $this->redirectIntended(default: $defaultRoute);
     }
 }; ?>
 
@@ -32,7 +32,8 @@ new #[Layout('layouts.guest')] class extends Component
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form wire:submit="login">
+    <form wire:submit="login" method="post" action="{{ route('login') }}">
+        @csrf
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('auth.email')" />

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Contacts;
 
+use App\Helpers\ArabicTransliterator;
 use App\Models\Contact;
 use App\Models\Lead;
 use App\Models\Stage;
@@ -28,6 +29,8 @@ class Manage extends Component
     public $selectedContacts = [];
 
     public $selectAll = false;
+
+    public $message = '';
 
     public function updatedSelectAll($value)
     {
@@ -110,6 +113,19 @@ class Manage extends Component
             $this->restore($id);
         }
         $this->resetSelection();
+    }
+
+    public function translateAllNames()
+    {
+        $count = 0;
+        Contact::whereNotNull('nameAr')->where('nameAr', '!=', '')->each(function ($contact) use (&$count) {
+            $latin = ArabicTransliterator::toLatin($contact->nameAr);
+            if ($latin !== $contact->nameEn) {
+                $contact->update(['nameEn' => $latin]);
+                $count++;
+            }
+        });
+        $this->message = "Transliterated {$count} contact(s).";
     }
 
     #[Computed]
