@@ -568,6 +568,7 @@
             </div>
             @if(!$isParent)
             <a href="{{ route('leads.import') }}" wire:navigate class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.import') }}</a>
+            <a href="{{ route('leads.export') }}" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.export') }}</a>
             <button wire:click="translateAllNames" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('leads.translate_all') }}</button>
             <a href="{{ route('leads.create') }}" wire:navigate class="btn-primary">{{ __('leads.add_new') }}</a>
             @endif

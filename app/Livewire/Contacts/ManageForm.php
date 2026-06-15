@@ -49,6 +49,7 @@ class ManageForm extends Component
     public $documents = [];
     public $documentNotes = [];
 
+    public $creatingParentForStudent = false;
     public $creatingMotherForStudent = false;
     public $savedStudentState = [];
 
@@ -178,6 +179,7 @@ class ManageForm extends Component
             'status' => $this->status,
             'categories' => $this->categories,
             'parent_id' => $this->parent_id,
+            'mother_id' => $this->mother_id,
             'photo' => $this->photo,
         ];
 
@@ -195,6 +197,91 @@ class ManageForm extends Component
         $this->resetValidation();
 
         $this->creatingMotherForStudent = true;
+    }
+
+    public function startCreatingParent()
+    {
+        $this->savedStudentState = [
+            'nameEn' => $this->nameEn,
+            'nameAr' => $this->nameAr,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'nationality' => $this->nationality,
+            'religion' => $this->religion,
+            'gender' => $this->gender,
+            'national_id' => $this->national_id,
+            'passport_no' => $this->passport_no,
+            'status' => $this->status,
+            'categories' => $this->categories,
+            'mother_id' => $this->mother_id,
+            'photo' => $this->photo,
+        ];
+
+        $this->nameEn = '';
+        $this->nameAr = '';
+        $this->email = '';
+        $this->phone = '';
+        $this->nationality = 'Egyptian';
+        $this->national_id = '';
+        $this->passport_no = '';
+        $this->status = 'Active';
+        $this->mother_id = null;
+        $this->categories = ['Parent'];
+        $this->gender = 'Male';
+        $this->resetValidation();
+
+        $this->creatingParentForStudent = true;
+    }
+
+    public function saveParentAndReturn()
+    {
+        $this->validate([
+            'nameEn' => 'required|string|max:255',
+            'nameAr' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string',
+            'nationality' => 'required|string',
+            'national_id' => $this->nationality === 'Egyptian' ? 'nullable|digits:14' : 'nullable',
+            'passport_no' => $this->nationality !== 'Egyptian' ? 'nullable|string' : 'nullable',
+        ]);
+
+        $data = [
+            'nameEn' => $this->nameEn,
+            'nameAr' => $this->nameAr,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'nationality' => $this->nationality,
+            'gender' => 'Male',
+            'status' => $this->status,
+            'categories' => ['Parent'],
+        ];
+        if ($this->nationality === 'Egyptian') {
+            $data['national_id'] = $this->national_id;
+        } else {
+            $data['passport_no'] = $this->passport_no;
+        }
+
+        $newParent = Contact::create($data);
+
+        $saved = $this->savedStudentState;
+        $this->nameEn = $saved['nameEn'];
+        $this->nameAr = $saved['nameAr'];
+        $this->email = $saved['email'];
+        $this->phone = $saved['phone'];
+        $this->nationality = $saved['nationality'];
+        $this->religion = $saved['religion'];
+        $this->gender = $saved['gender'];
+        $this->national_id = $saved['national_id'];
+        $this->passport_no = $saved['passport_no'];
+        $this->status = $saved['status'];
+        $this->categories = $saved['categories'];
+        $this->parent_id = $newParent->id;
+        $this->mother_id = $saved['mother_id'] ?? null;
+        $this->photo = $saved['photo'] ?? null;
+        $this->savedStudentState = [];
+        $this->creatingParentForStudent = false;
+        $this->resetValidation();
+        unset($this->availableParents);
     }
 
     public function saveMotherAndReturn()
@@ -239,7 +326,7 @@ class ManageForm extends Component
         $this->passport_no = $saved['passport_no'];
         $this->status = $saved['status'];
         $this->categories = $saved['categories'];
-        $this->parent_id = $saved['parent_id'];
+        $this->parent_id = $saved['parent_id'] ?? null;
         $this->mother_id = $newMother->id;
         $this->photo = $saved['photo'] ?? null;
         $this->savedStudentState = [];
@@ -248,7 +335,7 @@ class ManageForm extends Component
         unset($this->availableMothers);
     }
 
-    public function cancelMotherCreation()
+    public function cancelParentCreation()
     {
         $saved = $this->savedStudentState;
         $this->nameEn = $saved['nameEn'];
@@ -262,9 +349,11 @@ class ManageForm extends Component
         $this->passport_no = $saved['passport_no'];
         $this->status = $saved['status'];
         $this->categories = $saved['categories'];
-        $this->parent_id = $saved['parent_id'];
+        $this->parent_id = $saved['parent_id'] ?? null;
+        $this->mother_id = $saved['mother_id'] ?? null;
         $this->photo = $saved['photo'] ?? null;
         $this->savedStudentState = [];
+        $this->creatingParentForStudent = false;
         $this->creatingMotherForStudent = false;
         $this->resetValidation();
     }

@@ -2,12 +2,17 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
       x-data="{
         darkMode: localStorage.getItem('darkMode') === 'true',
-        theme: localStorage.getItem('theme') || 'default',
+        appTheme: localStorage.getItem('appTheme') || 'default',
         mobileOpen: false
       }"
-      x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val); })"
+      x-init="
+        $watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val); });
+        $watch('appTheme', val => { localStorage.setItem('appTheme', val); document.documentElement.setAttribute('data-theme', val); });
+        if (darkMode) document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', appTheme);
+      "
       :class="{ 'dark': darkMode }"
-      :data-theme="theme">
+      :data-theme="appTheme">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,6 +29,7 @@
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         html { scroll-behavior: smooth; }
         body { font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -63,8 +69,6 @@
             50% { box-shadow: 0 0 0 16px color-mix(in srgb, var(--lp-accent-glow) 0%, transparent); }
         }
         .btn-primary { animation: pulse-glow 2s ease-in-out infinite; }
-
-        .nav-blur { backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); }
 
         .card-hover { transition: transform 0.4s ease, box-shadow 0.4s ease; }
         .card-hover:hover { transform: translateY(-4px); }
@@ -106,6 +110,27 @@
             --lp-hero-from: #0f0f0e;
             --lp-hero-via: #1a1a18;
             --lp-hero-to: #2d2d28;
+            --crm-bg-from: #f3f4f6;
+            --crm-bg-to: #e5e7eb;
+            --crm-text: #1f2937;
+            --crm-text-muted: #6b7280;
+            --crm-border: rgba(0,0,0,0.05);
+            --crm-panel-bg: rgba(255,255,255,0.7);
+            --crm-panel-border: rgba(255,255,255,0.5);
+            --crm-panel-shadow: rgba(0,0,0,0.05);
+            --crm-input-bg: #f9fafb;
+            --crm-input-border: #d1d5db;
+            --crm-input-focus-border: #6366f1;
+            --crm-btn-secondary-bg: #f3f4f6;
+            --crm-btn-secondary-hover: #e5e7eb;
+            --crm-btn-secondary-text: #374151;
+            --crm-divider: #e5e7eb;
+            --crm-btn-primary-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --crm-btn-primary-hover: #4f46e5;
+            --crm-btn-success-bg: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --crm-btn-success-hover: #059669;
+            --crm-btn-danger-text: #dc2626;
+            --crm-btn-danger-border: #fca5a5;
         }
         .dark {
             --lp-bg: #0a0a0a;
@@ -122,6 +147,27 @@
             --lp-hero-from: #0f0f0e;
             --lp-hero-via: #1a1a18;
             --lp-hero-to: #2d2d28;
+            --crm-bg-from: #0f172a;
+            --crm-bg-to: #1e293b;
+            --crm-text: #f1f5f9;
+            --crm-text-muted: #94a3b8;
+            --crm-border: rgba(255,255,255,0.05);
+            --crm-panel-bg: rgba(30,41,59,0.7);
+            --crm-panel-border: rgba(255,255,255,0.1);
+            --crm-panel-shadow: rgba(0,0,0,0.3);
+            --crm-input-bg: #1e293b;
+            --crm-input-border: #475569;
+            --crm-input-focus-border: #6366f1;
+            --crm-btn-secondary-bg: #334155;
+            --crm-btn-secondary-hover: #475569;
+            --crm-btn-secondary-text: #e2e8f0;
+            --crm-divider: #334155;
+            --crm-btn-primary-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --crm-btn-primary-hover: #4f46e5;
+            --crm-btn-success-bg: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --crm-btn-success-hover: #059669;
+            --crm-btn-danger-text: #dc2626;
+            --crm-btn-danger-border: #fca5a5;
         }
         [data-theme="natural"] {
             --lp-bg: #f8f3ea;
@@ -138,6 +184,27 @@
             --lp-hero-from: #2a1f16;
             --lp-hero-via: #3b2f25;
             --lp-hero-to: #4a3a2a;
+            --crm-bg-from: #f5efe6;
+            --crm-bg-to: #ebdcc3;
+            --crm-text: #3b2f25;
+            --crm-text-muted: #8c7b6b;
+            --crm-border: rgba(120,90,50,0.12);
+            --crm-panel-bg: rgba(255,252,245,0.82);
+            --crm-panel-border: rgba(255,225,180,0.5);
+            --crm-panel-shadow: rgba(120,90,50,0.08);
+            --crm-input-bg: #faf5ec;
+            --crm-input-border: #d6c6b0;
+            --crm-input-focus-border: #8c6b3a;
+            --crm-btn-secondary-bg: #ece2d0;
+            --crm-btn-secondary-hover: #dfd1b5;
+            --crm-btn-secondary-text: #3b2f25;
+            --crm-divider: #e2d6bf;
+            --crm-btn-primary-bg: linear-gradient(135deg, #d4a96a 0%, #b8894a 100%);
+            --crm-btn-primary-hover: #b8894a;
+            --crm-btn-success-bg: linear-gradient(135deg, #8a9e6a 0%, #6d7e52 100%);
+            --crm-btn-success-hover: #6d7e52;
+            --crm-btn-danger-text: #b85a4a;
+            --crm-btn-danger-border: #d49585;
         }
         .dark[data-theme="natural"] {
             --lp-bg: #1c1510;
@@ -154,6 +221,101 @@
             --lp-hero-from: #0d0906;
             --lp-hero-via: #1c1510;
             --lp-hero-to: #2a1f16;
+            --crm-bg-from: #1c1510;
+            --crm-bg-to: #2a1f16;
+            --crm-text: #f3e9d8;
+            --crm-text-muted: #bba88e;
+            --crm-border: rgba(255,200,120,0.1);
+            --crm-panel-bg: rgba(55,40,25,0.8);
+            --crm-panel-border: rgba(255,200,120,0.15);
+            --crm-panel-shadow: rgba(0,0,0,0.35);
+            --crm-input-bg: #2a1f16;
+            --crm-input-border: #5c4a3a;
+            --crm-input-focus-border: #d4a96a;
+            --crm-btn-secondary-bg: #3e2e1e;
+            --crm-btn-secondary-hover: #54402c;
+            --crm-btn-secondary-text: #f0e4d0;
+            --crm-divider: #5c4530;
+            --crm-btn-primary-bg: linear-gradient(135deg, #d4a96a 0%, #b8894a 100%);
+            --crm-btn-primary-hover: #b8894a;
+            --crm-btn-success-bg: linear-gradient(135deg, #8a9e6a 0%, #6d7e52 100%);
+            --crm-btn-success-hover: #6d7e52;
+            --crm-btn-danger-text: #b85a4a;
+            --crm-btn-danger-border: #d49585;
+        }
+        [data-theme="forest"] {
+            --lp-bg: #FFF4E1;
+            --lp-text: #1A312C;
+            --lp-text-muted: #428475;
+            --lp-section-alt: #e8f5ed;
+            --lp-card-bg: #ffffff;
+            --lp-card-border: #89D7B7;
+            --lp-accent: #428475;
+            --lp-accent-hover: #89D7B7;
+            --lp-accent-text: #1A312C;
+            --lp-accent-light: #e8f5ed;
+            --lp-accent-glow: rgba(66, 132, 117, 0.4);
+            --lp-hero-from: #1A312C;
+            --lp-hero-via: #2a4a3c;
+            --lp-hero-to: #3a5a4c;
+            --crm-bg-from: #FFF4E1;
+            --crm-bg-to: #f0e8d4;
+            --crm-text: #1A312C;
+            --crm-text-muted: #428475;
+            --crm-border: rgba(26,49,44,0.08);
+            --crm-panel-bg: rgba(255,244,225,0.82);
+            --crm-panel-border: rgba(137,215,183,0.4);
+            --crm-panel-shadow: rgba(26,49,44,0.06);
+            --crm-input-bg: #f7f0e4;
+            --crm-input-border: #89D7B7;
+            --crm-input-focus-border: #428475;
+            --crm-btn-secondary-bg: #e8f5ed;
+            --crm-btn-secondary-hover: #d0ebdb;
+            --crm-btn-secondary-text: #1A312C;
+            --crm-divider: #c8e5d5;
+            --crm-btn-primary-bg: linear-gradient(135deg, #428475 0%, #1A312C 100%);
+            --crm-btn-primary-hover: #1A312C;
+            --crm-btn-success-bg: linear-gradient(135deg, #89D7B7 0%, #428475 100%);
+            --crm-btn-success-hover: #428475;
+            --crm-btn-danger-text: #c0392b;
+            --crm-btn-danger-border: #e8a098;
+        }
+        .dark[data-theme="forest"] {
+            --lp-bg: #1A312C;
+            --lp-text: #FFF4E1;
+            --lp-text-muted: #89D7B7;
+            --lp-section-alt: #1f3a34;
+            --lp-card-bg: #243d36;
+            --lp-card-border: #428475;
+            --lp-accent: #89D7B7;
+            --lp-accent-hover: #428475;
+            --lp-accent-text: #89D7B7;
+            --lp-accent-light: #1A312C;
+            --lp-accent-glow: rgba(137, 215, 183, 0.4);
+            --lp-hero-from: #0a1a16;
+            --lp-hero-via: #1A312C;
+            --lp-hero-to: #2a4a3c;
+            --crm-bg-from: #1A312C;
+            --crm-bg-to: #243d36;
+            --crm-text: #FFF4E1;
+            --crm-text-muted: #89D7B7;
+            --crm-border: rgba(137,215,183,0.1);
+            --crm-panel-bg: rgba(26,49,44,0.82);
+            --crm-panel-border: rgba(137,215,183,0.15);
+            --crm-panel-shadow: rgba(0,0,0,0.3);
+            --crm-input-bg: #243d36;
+            --crm-input-border: #428475;
+            --crm-input-focus-border: #89D7B7;
+            --crm-btn-secondary-bg: #2a4a3c;
+            --crm-btn-secondary-hover: #3a5a4c;
+            --crm-btn-secondary-text: #FFF4E1;
+            --crm-divider: #428475;
+            --crm-btn-primary-bg: linear-gradient(135deg, #89D7B7 0%, #428475 100%);
+            --crm-btn-primary-hover: #428475;
+            --crm-btn-success-bg: linear-gradient(135deg, #428475 0%, #1A312C 100%);
+            --crm-btn-success-hover: #1A312C;
+            --crm-btn-danger-text: #e8a098;
+            --crm-btn-danger-border: #c0392b;
         }
         [x-cloak] { display: none !important; }
 
@@ -208,12 +370,30 @@
             border-color: var(--lp-accent);
             background: var(--lp-accent-light);
         }
+        body {
+            background-image: url('/top-view-school-elements-chalk-board.jpg');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: rgba(255, 255, 255, 0.82);
+            pointer-events: none;
+        }
+        .dark body::before {
+            background: rgba(0, 0, 0, 0.72);
+        }
     </style>
 </head>
-<body style="background: var(--lp-bg); color: var(--lp-text);">
+<body style="color: var(--lp-text);">
 
     <!-- Nav -->
-    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur" style="background: color-mix(in srgb, var(--lp-card-bg) 85%, transparent); border-bottom: 1px solid var(--lp-card-border);">
+    <nav class="fixed top-0 left-0 right-0 z-50" style="background: var(--crm-panel-bg); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); border-bottom: 1px solid var(--crm-border);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 lg:h-20">
                 <a href="#" class="flex items-center gap-3 font-semibold text-lg no-underline" style="color: var(--lp-text);">
@@ -229,26 +409,21 @@
                     @endif
                     <a href="#info" class="nav-link nav-link-underline px-3 py-2 text-sm font-medium rounded-lg transition-colors no-underline">{{ __('welcome.contact') }}</a>
                 </div>
-                <div class="flex items-center gap-3">
-                    <!-- Theme Toggle -->
-                    <button @click="theme = theme === 'natural' ? 'default' : 'natural'; localStorage.setItem('theme', theme); document.documentElement.setAttribute('data-theme', theme);"
-                            x-show="theme === 'default'"
-                            class="w-9 h-9 rounded-full border border-[var(--lp-card-border)] flex items-center justify-center hover:bg-[var(--lp-card-bg)] transition-all text-[var(--lp-text-muted)]"
-                            title="{{ __('welcome.theme_brown') }}" x-cloak>
-                        <span style="font-size: 1rem;">🌰</span>
+                <div class="flex items-center gap-2">
+                    <!-- Theme Toggle (dashboard style) -->
+                    <button @click="appTheme = appTheme === 'default' ? 'natural' : appTheme === 'natural' ? 'forest' : 'default'" type="button"
+                            class="inline-flex items-center px-3 py-2 border text-sm leading-4 font-medium rounded-md focus:outline-none transition ease-in-out duration-150"
+                            style="border-color: var(--crm-border); color: var(--crm-text-muted); background: var(--crm-btn-secondary-bg);">
+                        Theme <span x-text="appTheme === 'default' ? '🌞' : appTheme === 'natural' ? '🌰' : '🌿'" style="margin-left: 0.25rem;"></span>
                     </button>
-                    <button @click="theme = theme === 'natural' ? 'default' : 'natural'; localStorage.setItem('theme', theme); document.documentElement.setAttribute('data-theme', theme);"
-                            x-show="theme === 'natural'"
-                            class="w-9 h-9 rounded-full border border-[var(--lp-card-border)] flex items-center justify-center hover:bg-[var(--lp-card-bg)] transition-all text-[var(--lp-text-muted)]"
-                            title="{{ __('welcome.theme_default') }}" x-cloak>
-                        <span style="font-size: 1rem;">🎨</span>
-                    </button>
-                    <!-- Dark Mode Toggle -->
-                    <button @click="darkMode = !darkMode"
-                            class="w-9 h-9 rounded-full border border-[var(--lp-card-border)] flex items-center justify-center hover:bg-[var(--lp-card-bg)] transition-all text-[var(--lp-text-muted)]"
-                            title="{{ __('welcome.dark_mode') }}">
-                        <span x-show="!darkMode" style="font-size: 1rem;">🌙</span>
-                        <span x-show="darkMode" style="font-size: 1rem;" x-cloak>☀️</span>
+                    <!-- Dark Mode Toggle (dashboard style) -->
+                    <button @click="darkMode = !darkMode" type="button"
+                            class="inline-flex items-center justify-center w-9 h-9 rounded-md focus:outline-none transition duration-150 ease-in-out"
+                            style="color: var(--crm-text-muted);">
+                        <svg x-show="!darkMode" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                        </svg>
+                        <span x-show="darkMode" x-cloak style="font-size: 1.25rem; line-height: 1;">☀️</span>
                     </button>
                     @auth
                         <a href="{{ url('/dashboard') }}" class="nav-link px-3 py-2 text-sm font-medium rounded-lg no-underline">{{ __('nav.dashboard') }}</a>
@@ -268,7 +443,7 @@
 
     <!-- Hero -->
     <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#0f0f0e] via-[#1a1a18] to-[#2d2d28]">
-        <div class="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]" style="background-image: radial-gradient(circle at 25% 50%, #fff 1px, transparent 1px), radial-gradient(circle at 75% 50%, #fff 1px, transparent 1px); background-size: 60px 60px, 40px 40px;"></div>
+        <div class="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]" style="background-image: url('/top-view-school-elements-chalk-board.jpg'); background-attachment: fixed; background-size: cover; background-position: center;"></div>
         <div class="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto hero-content">
             @if($school->logo)
             <img src="{{ $school->logo }}" alt="{{ $school->nameEn }}" class="h-20 w-auto mx-auto mb-6 opacity-90">
@@ -298,10 +473,7 @@
                     {{ __('welcome.learn_more') }}
                 </a>
                 @endif
-                <a href="#info" class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-2xl transition-all hover:-translate-y-1 backdrop-blur-sm no-underline">
-                    {{ __('welcome.learn_more') }}
-                </a>
-            </div>
+                </div>
         </div>
 
         <!-- Scrolling stats marquee (like eloqwnt's infinity line) -->

@@ -2,12 +2,15 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"
       x-data="{
         darkMode: localStorage.getItem('darkMode') === 'true',
-        theme: localStorage.getItem('theme') || 'default',
+        appTheme: localStorage.getItem('appTheme') || 'default',
         menuOpen: false
       }"
-      x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val); })"
+      x-init="
+        $watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val); });
+        $watch('appTheme', val => localStorage.setItem('appTheme', val));
+      "
       :class="{ 'dark': darkMode }"
-      :data-theme="theme">
+      :data-theme="appTheme">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -108,6 +111,46 @@
                 --crm-btn-primary-hover: #b8894a;
                 --crm-btn-success-bg: linear-gradient(135deg, #8a9e6a 0%, #6d7e52 100%);
                 --crm-btn-success-hover: #6d7e52;
+            }
+            [data-theme="forest"] {
+                --crm-bg-from: #f0f5f0;
+                --crm-bg-to: #dce8dc;
+                --crm-text: #1a312c;
+                --crm-text-muted: #428475;
+                --crm-border: rgba(26,49,44,0.12);
+                --crm-panel-bg: rgba(255,255,255,0.75);
+                --crm-panel-border: rgba(137,215,183,0.4);
+                --crm-panel-shadow: rgba(26,49,44,0.08);
+                --crm-input-bg: #f4faf4;
+                --crm-input-border: #89d7b7;
+                --crm-input-focus-border: #428475;
+                --crm-card-bg: rgba(255,255,255,0.7);
+                --crm-btn-primary-bg: linear-gradient(135deg, #428475 0%, #1a312c 100%);
+                --crm-btn-primary-hover: #1a312c;
+                --crm-btn-success-bg: linear-gradient(135deg, #89d7b7 0%, #428475 100%);
+                --crm-btn-success-hover: #428475;
+                --crm-btn-danger-text: #c0392b;
+                --crm-btn-danger-border: #e8a098;
+                --crm-btn-edit-text: #428475;
+                --crm-btn-edit-border: #89d7b7;
+            }
+            .dark[data-theme="forest"] {
+                --crm-bg-from: #0f1e1a;
+                --crm-bg-to: #1a312c;
+                --crm-text: #fff4e1;
+                --crm-text-muted: #89d7b7;
+                --crm-border: rgba(137,215,183,0.1);
+                --crm-panel-bg: rgba(26,49,44,0.8);
+                --crm-panel-border: rgba(137,215,183,0.15);
+                --crm-panel-shadow: rgba(0,0,0,0.4);
+                --crm-input-bg: #1a312c;
+                --crm-input-border: #428475;
+                --crm-input-focus-border: #89d7b7;
+                --crm-card-bg: rgba(26,49,44,0.75);
+                --crm-btn-primary-bg: linear-gradient(135deg, #89d7b7 0%, #428475 100%);
+                --crm-btn-primary-hover: #428475;
+                --crm-btn-success-bg: linear-gradient(135deg, #428475 0%, #1a312c 100%);
+                --crm-btn-success-hover: #1a312c;
             }
             [x-cloak] { display: none !important; }
 

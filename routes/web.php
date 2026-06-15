@@ -71,6 +71,56 @@ Route::get('leads/import/template', function () {
     }, 'leads-import-template.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
 })->middleware(['auth', 'verified'])->name('leads.import.template');
 
+Route::get('leads/export', function () {
+    $leads = \App\Models\Lead::with('parent', 'mother', 'grade')
+        ->orderBy('nameEn')
+        ->get();
+
+    $filename = 'leads-' . now()->format('Y-m-d') . '.xlsx';
+
+    return response()->stream(function () use ($leads) {
+        $writer = new \OpenSpout\Writer\XLSX\Writer;
+        $writer->openToFile('php://output');
+
+        $headerRow = \OpenSpout\Common\Entity\Row::fromValues([
+            'Name (EN)', 'Name (AR)', 'Email', 'Phone',
+            'Nationality', 'Religion', 'Gender', 'Categories',
+            'National ID', 'Passport No', 'Birth Date',
+            'Status', 'Source', 'Notes',
+            'Parent Name', 'Mother Name', 'Grade',
+        ]);
+        $writer->addRow($headerRow);
+
+        foreach ($leads as $lead) {
+            $row = \OpenSpout\Common\Entity\Row::fromValues([
+                $lead->nameEn,
+                $lead->nameAr,
+                $lead->email,
+                $lead->phone,
+                $lead->nationality,
+                $lead->religion,
+                $lead->gender,
+                is_array($lead->categories) ? implode(', ', $lead->categories) : $lead->categories,
+                $lead->national_id,
+                $lead->passport_no,
+                $lead->birth_date?->format('Y-m-d'),
+                $lead->status,
+                $lead->source,
+                $lead->notes,
+                $lead->parent ? ($lead->parent->nameEn . ' / ' . $lead->parent->nameAr) : '',
+                $lead->mother ? ($lead->mother->nameEn . ' / ' . $lead->mother->nameAr) : '',
+                $lead->grade?->name ?? '',
+            ]);
+            $writer->addRow($row);
+        }
+
+        $writer->close();
+    }, 200, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    ]);
+})->middleware(['auth', 'verified'])->name('leads.export');
+
 Route::get('contacts', \App\Livewire\Contacts\Manage::class)
     ->middleware(['auth', 'verified'])
     ->name('contacts');

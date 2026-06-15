@@ -99,21 +99,28 @@
             <a href="{{ route('contacts') }}" wire:navigate class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">{{ __('general.back') }}</a>
         </div>
         <h1>
-            @if($creatingMotherForStudent)
+            @if($creatingParentForStudent)
+                {{ __('contacts.new_father') }}
+            @elseif($creatingMotherForStudent)
                 {{ __('contacts.new_mother') }}
             @else
                 {{ $contact ? __('contacts.edit_contact') : __('contacts.new_contact') }}
             @endif
         </h1>
 
-        @if($creatingMotherForStudent)
+        @if($creatingParentForStudent)
+        <div class="parent-creation-banner">
+            <span>⭐</span>
+            <span>{{ __('contacts.creating_father') }}</span>
+        </div>
+        @elseif($creatingMotherForStudent)
         <div class="parent-creation-banner">
             <span>⭐</span>
             <span>{{ __('contacts.creating_mother') }}</span>
         </div>
         @endif
 
-        <form wire:submit.prevent="{{ $creatingMotherForStudent ? 'saveMotherAndReturn' : 'save' }}">
+        <form wire:submit.prevent="{{ $creatingParentForStudent ? 'saveParentAndReturn' : ($creatingMotherForStudent ? 'saveMotherAndReturn' : 'save') }}">
             <div class="grid-2">
                 <div class="form-group">
                     <label>{{ __('general.name_en') }}</label>
@@ -142,6 +149,97 @@
                 </div>
                 @error('photo') <span class="error">{{ $message }}</span> @enderror
             </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>{{ __('general.email') }}</label>
+                    <input type="email" wire:model.blur="email" placeholder="{{ __('general.email_placeholder') }}">
+                    @error('email') <span class="error">{{ $message }}</span> @enderror
+                </div>
+                <div class="form-group">
+                    <label>{{ __('general.phone') }}</label>
+                    <input type="text" wire:model.blur="phone" placeholder="{{ __('general.phone_placeholder') }}">
+                    @error('phone') <span class="error">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>{{ __('general.categories') }}</label>
+                    <div class="checkbox-group" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem;">
+                        @foreach($this->allowedCategoryOptions as $cat)
+                        <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+                            <div style="position: relative; width: 1.1rem; height: 1.1rem; flex-shrink: 0;">
+                                <input type="checkbox" value="{{ $cat }}" wire:click="toggleCategory('{{ $cat }}')" {{ in_array($cat, $categories) ? 'checked' : '' }} style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; margin: 0;">
+                                <div style="width: 100%; height: 100%; border: 2px solid var(--crm-input-border, #d1d5db); border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; background: transparent !important;">
+                                    @if(in_array($cat, $categories)) <span style="font-size: 0.75rem; line-height: 1;">✅</span> @endif
+                                </div>
+                            </div>
+                            <span style="font-size: 0.875rem; color: var(--crm-text);">{{ $cat }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                    @error('categories') <span class="error">{{ $message }}</span> @enderror
+                </div>
+                <div class="form-group">
+                    <label>{{ __('general.nationality') }}</label>
+                    <select wire:model.live="nationality">
+                        <option value="Egyptian">{{ __('general.egyptian') }}</option>
+                        <option value="American">{{ __('general.american') }}</option>
+                        <option value="British">{{ __('general.british') }}</option>
+                        <option value="Other">{{ __('general.other') }}</option>
+                    </select>
+                    @error('nationality') <span class="error">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            @if($nationality === 'Egyptian')
+            <div class="form-group">
+                <label>{{ __('general.national_id') }}</label>
+                <input type="text" wire:model="national_id" placeholder="{{ __('general.national_id_placeholder') }}">
+                @error('national_id') <span class="error">{{ $message }}</span> @enderror
+                <small style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ __('general.age_birth_auto') }}</small>
+            </div>
+            @else
+            <div class="form-group">
+                <label>{{ __('general.passport_no') }}</label>
+                <input type="text" wire:model="passport_no" placeholder="{{ __('general.passport_placeholder') }}">
+                @error('passport_no') <span class="error">{{ $message }}</span> @enderror
+            </div>
+            @endif
+
+            @if(!$creatingParentForStudent && !$creatingMotherForStudent && in_array('Student', $categories))
+            <hr class="divider">
+            <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">{{ __('general.parent_info') }}</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>{{ __('general.father') }}</label>
+                    <div class="parent-select-row">
+                        <select wire:model="parent_id" style="flex: 1;">
+                            <option value="">{{ __('general.select_father') }}</option>
+                            @foreach($this->availableParents as $parent)
+                            <option value="{{ $parent->id }}">{{ $parent->nameEn }} ({{ $parent->nameAr }})</option>
+                            @endforeach
+                        </select>
+                        <button type="button" wire:click="startCreatingParent" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap;">{{ __('general.add') }}</button>
+                    </div>
+                    @error('parent_id') <span class="error">{{ $message }}</span> @enderror
+                </div>
+                <div class="form-group">
+                    <label>{{ __('general.mother') }}</label>
+                    <div class="parent-select-row">
+                        <select wire:model="mother_id" style="flex: 1;">
+                            <option value="">{{ __('general.select_mother') }}</option>
+                            @foreach($this->availableMothers as $mother)
+                            <option value="{{ $mother->id }}">{{ $mother->nameEn }} ({{ $mother->nameAr }})</option>
+                            @endforeach
+                        </select>
+                        <button type="button" wire:click="startCreatingMother" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap;">{{ __('general.add') }}</button>
+                    </div>
+                    @error('mother_id') <span class="error">{{ $message }}</span> @enderror
+                </div>
+            </div>
+            @endif
 
             <div class="glass-panel" style="margin-bottom: 0.75rem;">
                 <div class="panel-header" style="font-size: 0.875rem; font-weight: 600; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--crm-divider);">
@@ -188,47 +286,8 @@
                 </div>
             </div>
 
+            <hr class="divider">
             <div class="grid-2">
-                <div class="form-group">
-                    <label>{{ __('general.email') }}</label>
-                    <input type="email" wire:model.blur="email" placeholder="{{ __('general.email_placeholder') }}">
-                    @error('email') <span class="error">{{ $message }}</span> @enderror
-                </div>
-                <div class="form-group">
-                    <label>{{ __('general.phone') }}</label>
-                    <input type="text" wire:model.blur="phone" placeholder="{{ __('general.phone_placeholder') }}">
-                    @error('phone') <span class="error">{{ $message }}</span> @enderror
-                </div>
-            </div>
-
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>{{ __('general.categories') }}</label>
-                    <div class="checkbox-group" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem;">
-                        @foreach($this->allowedCategoryOptions as $cat)
-                        <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
-                            <div style="position: relative; width: 1.1rem; height: 1.1rem; flex-shrink: 0;">
-                                <input type="checkbox" value="{{ $cat }}" wire:click="toggleCategory('{{ $cat }}')" {{ in_array($cat, $categories) ? 'checked' : '' }} style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; margin: 0;">
-                                <div style="width: 100%; height: 100%; border: 2px solid var(--crm-input-border, #d1d5db); border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; background: transparent !important;">
-                                    @if(in_array($cat, $categories)) <span style="font-size: 0.75rem; line-height: 1;">✅</span> @endif
-                                </div>
-                            </div>
-                            <span style="font-size: 0.875rem; color: var(--crm-text);">{{ $cat }}</span>
-                        </label>
-                        @endforeach
-                    </div>
-                    @error('categories') <span class="error">{{ $message }}</span> @enderror
-                </div>
-                <div class="form-group">
-                    <label>{{ __('general.nationality') }}</label>
-                    <select wire:model.live="nationality">
-                        <option value="Egyptian">{{ __('general.egyptian') }}</option>
-                        <option value="American">{{ __('general.american') }}</option>
-                        <option value="British">{{ __('general.british') }}</option>
-                        <option value="Other">{{ __('general.other') }}</option>
-                    </select>
-                    @error('nationality') <span class="error">{{ $message }}</span> @enderror
-                </div>
                 <div class="form-group">
                     <label>{{ __('general.status') }}</label>
                     <select wire:model="status">
@@ -238,9 +297,6 @@
                     </select>
                     @error('status') <span class="error">{{ $message }}</span> @enderror
                 </div>
-            </div>
-
-            <div class="grid-2">
                 <div class="form-group">
                     <label>{{ __('general.religion') }}</label>
                     <select wire:model="religion">
@@ -250,6 +306,8 @@
                     </select>
                     @error('religion') <span class="error">{{ $message }}</span> @enderror
                 </div>
+            </div>
+            <div class="grid-2">
                 <div class="form-group">
                     <label>{{ __('general.gender') }}</label>
                     <select wire:model="gender">
@@ -261,29 +319,17 @@
                 </div>
             </div>
 
-            @if($nationality === 'Egyptian')
-            <div class="form-group">
-                <label>{{ __('general.national_id') }}</label>
-                <input type="text" wire:model="national_id" placeholder="{{ __('general.national_id_placeholder') }}">
-                @error('national_id') <span class="error">{{ $message }}</span> @enderror
-                <small style="color: var(--crm-text-muted); font-size: 0.75rem;">{{ __('general.age_birth_auto') }}</small>
-            </div>
-            @else
-            <div class="form-group">
-                <label>{{ __('general.passport_no') }}</label>
-                <input type="text" wire:model="passport_no" placeholder="{{ __('general.passport_placeholder') }}">
-                @error('passport_no') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            @endif
-
-            @if(!$creatingMotherForStudent && in_array('Student', $categories))
+            @if(!$creatingParentForStudent && !$creatingMotherForStudent && in_array('Student', $categories))
             <hr class="divider">
             <div style="font-weight: 600; color: var(--crm-text-muted); margin-bottom: 0.75rem;">{{ __('general.student_academic_info') }}</div>
             @endif
 
             <div class="actions">
-                @if($creatingMotherForStudent)
-                    <button type="button" wire:click="cancelMotherCreation" class="btn-secondary">{{ __('contacts.back_to_student') }}</button>
+                @if($creatingParentForStudent)
+                    <button type="button" wire:click="cancelParentCreation" class="btn-secondary">{{ __('contacts.back_to_student') }}</button>
+                    <button type="submit" class="btn-success">{{ __('contacts.save_father') }}</button>
+                @elseif($creatingMotherForStudent)
+                    <button type="button" wire:click="cancelParentCreation" class="btn-secondary">{{ __('contacts.back_to_student') }}</button>
                     <button type="submit" class="btn-success">{{ __('contacts.save_mother') }}</button>
                 @else
                 <a href="{{ route('contacts') }}" wire:navigate class="btn-secondary">{{ __('general.cancel') }}</a>

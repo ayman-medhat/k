@@ -113,12 +113,12 @@ $currentSection = !$allowedSections ? '' : (request('section') && in_array(reque
 
             <div class="hidden sm:flex sm:items-center sm:justify-end sm:ms-6 gap-2">
                 <button @click="darkMode = !darkMode" type="button" class="inline-flex items-center p-2 rounded-md focus:outline-none transition duration-150 ease-in-out" style="color: var(--crm-text-muted);">
-                    <svg x-show="!darkMode" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
-                    <svg x-show="darkMode" x-cloak class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.444 5.668A1 1 0 0112 17h-1a1 1 0 110-2h1a3 3 0 00.272-5.92l-.773-1.541A1 1 0 019.093 8H7.782a1 1 0 00-.874 1.49l.717 1.11A5.002 5.002 0 0117 17h1a1 1 0 110 2h-1a7.001 7.001 0 01-.554-2.332z" clip-rule="evenodd" /></svg>
+                    <span x-show="!darkMode" x-cloak style="font-size: 1.25rem; line-height: 1;">🌙</span>
+                    <span x-show="darkMode" x-cloak style="font-size: 1.25rem; line-height: 1;">☀️</span>
                 </button>
-                <button @click="appTheme = appTheme === 'natural' ? 'default' : 'natural'" type="button" class="inline-flex items-center px-3 py-2 border text-sm leading-4 font-medium rounded-md focus:outline-none transition ease-in-out duration-150" style="border-color: var(--crm-border); color: var(--crm-text-muted); background: var(--crm-btn-secondary-bg);">
-                    Theme <span x-text="appTheme === 'natural' ? '🌿' : '🌞'"></span>
-                </button>
+<button @click="appTheme = appTheme === 'default' ? 'natural' : appTheme === 'natural' ? 'forest' : 'default'" type="button" class="inline-flex items-center px-3 py-2 border text-sm leading-4 font-medium rounded-md focus:outline-none transition ease-in-out duration-150" style="border-color: var(--crm-border); color: var(--crm-text-muted); background: var(--crm-btn-secondary-bg);">
+                        Theme <span x-text="appTheme === 'default' ? '🌞' : appTheme === 'natural' ? '🌰' : '🌿'" style="margin-left: 0.25rem;"></span>
+                    </button>
                 <a href="{{ route('language.switch', app()->getLocale() === 'en' ? 'ar' : 'en') }}" class="inline-flex items-center justify-center w-9 h-9 rounded-md focus:outline-none transition ease-in-out duration-150" style="color: var(--crm-text-muted); background: transparent; text-decoration: none;">
                     @if (app()->getLocale() === 'en')
                         <img src="{{ asset('Egypt-Flag.ico') }}" alt="Arabic" class="h-5 w-5" style="border-radius: 2px;">

@@ -4,7 +4,7 @@
      Provides the app shell: nav, theme CSS variables, dark mode
      support via Alpine.js, and a <main> slot for page content
      ============================================================ --}}
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val); })" :class="{ 'dark': darkMode }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', appTheme: localStorage.getItem('appTheme') || 'default' }" x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val); }); $watch('appTheme', val => localStorage.setItem('appTheme', val));" :class="{ 'dark': darkMode }" :data-theme="appTheme">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -193,6 +193,90 @@
                 --crm-pill-bg: #5c3d1c;
                 --crm-pill-text: #f5e0c0;
                 --crm-empty-bg: rgba(50,35,20,0.7);
+            }
+            [data-theme="forest"] {
+                --crm-bg-from: #f0f5f0;
+                --crm-bg-to: #dce8dc;
+                --crm-text: #1a312c;
+                --crm-text-muted: #428475;
+                --crm-border: rgba(26,49,44,0.12);
+                --crm-panel-bg: rgba(255,255,255,0.75);
+                --crm-panel-border: rgba(137,215,183,0.4);
+                --crm-panel-shadow: rgba(26,49,44,0.08);
+                --crm-input-bg: #f4faf4;
+                --crm-input-border: #89d7b7;
+                --crm-input-focus-border: #428475;
+                --crm-table-head: #1a312c;
+                --crm-card-bg: rgba(255,255,255,0.7);
+                --crm-badge-indigo-bg: #dce8dc;
+                --crm-badge-indigo-text: #1a312c;
+                --crm-badge-student-bg: #fff4e1;
+                --crm-badge-student-text: #428475;
+                --crm-badge-parent-bg: #e0f2e0;
+                --crm-badge-parent-text: #1a312c;
+                --crm-banner-bg: linear-gradient(135deg, #fff4e1, #e0f2e0);
+                --crm-banner-border: #89d7b7;
+                --crm-banner-label: #428475;
+                --crm-banner-name: #1a312c;
+                --crm-dropdown-bg: #ffffff;
+                --crm-btn-secondary-bg: #e0ece0;
+                --crm-btn-secondary-hover: #d0e0d0;
+                --crm-btn-secondary-text: #1a312c;
+                --crm-divider: #d0e0d0;
+                --crm-tab-bg: rgba(255,255,255,0.6);
+                --crm-tab-active-bg: #ffffff;
+                --crm-tab-text: #428475;
+                --crm-tab-active-text: #1a312c;
+                --crm-tab-active-border: #428475;
+                --crm-pill-bg: #dce8dc;
+                --crm-pill-text: #1a312c;
+                --crm-empty-bg: rgba(255,255,255,0.7);
+                --crm-btn-primary-bg: linear-gradient(135deg, #428475 0%, #1a312c 100%);
+                --crm-btn-primary-hover: #1a312c;
+                --crm-btn-success-bg: linear-gradient(135deg, #89d7b7 0%, #428475 100%);
+                --crm-btn-success-hover: #428475;
+                --crm-btn-danger-text: #c0392b;
+                --crm-btn-danger-border: #e8a098;
+                --crm-btn-edit-text: #428475;
+                --crm-btn-edit-border: #89d7b7;
+            }
+            .dark[data-theme="forest"] {
+                --crm-bg-from: #0f1e1a;
+                --crm-bg-to: #1a312c;
+                --crm-text: #fff4e1;
+                --crm-text-muted: #89d7b7;
+                --crm-border: rgba(137,215,183,0.1);
+                --crm-panel-bg: rgba(26,49,44,0.8);
+                --crm-panel-border: rgba(137,215,183,0.15);
+                --crm-panel-shadow: rgba(0,0,0,0.4);
+                --crm-input-bg: #1a312c;
+                --crm-input-border: #428475;
+                --crm-input-focus-border: #89d7b7;
+                --crm-table-head: #89d7b7;
+                --crm-card-bg: rgba(26,49,44,0.75);
+                --crm-badge-indigo-bg: #1a312c;
+                --crm-badge-indigo-text: #89d7b7;
+                --crm-badge-student-bg: #428475;
+                --crm-badge-student-text: #fff4e1;
+                --crm-badge-parent-bg: #1a312c;
+                --crm-badge-parent-text: #89d7b7;
+                --crm-banner-bg: linear-gradient(135deg, #1a312c, #428475);
+                --crm-banner-border: #428475;
+                --crm-banner-label: #fff4e1;
+                --crm-banner-name: #89d7b7;
+                --crm-dropdown-bg: #1a312c;
+                --crm-btn-secondary-bg: #2a4540;
+                --crm-btn-secondary-hover: #3a5a54;
+                --crm-btn-secondary-text: #fff4e1;
+                --crm-divider: #2a4540;
+                --crm-tab-bg: rgba(255,255,255,0.06);
+                --crm-tab-active-bg: #1a312c;
+                --crm-tab-text: #89d7b7;
+                --crm-tab-active-text: #fff4e1;
+                --crm-tab-active-border: #89d7b7;
+                --crm-pill-bg: #428475;
+                --crm-pill-text: #fff4e1;
+                --crm-empty-bg: rgba(26,49,44,0.7);
             }
             [data-theme="natural"] .crm-container {
                 background: linear-gradient(135deg, var(--crm-bg-from) 0%, var(--crm-bg-to) 100%);
