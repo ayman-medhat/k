@@ -552,10 +552,12 @@
                     {{ __('general.cards') }}
                 </button>
             </div>
+            @if(!($isGuest ?? false))
             <a href="{{ route('contacts.import') }}" wire:navigate class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.import') }}</a>
             <button wire:click="translateAllNames" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.translate_all') }}</button>
             <a href="{{ route('contacts.export') }}" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.export') }}</a>
             <a href="{{ route('contacts.create') }}" wire:navigate class="btn-primary">{{ __('contacts.add_new') }}</a>
+            @endif
         </div>
     </div>
 
@@ -601,7 +603,7 @@
     </div>
 
     @if($viewMode === 'list')
-    @if(count($selectedContacts) > 0)
+    @if(!($isGuest ?? false) && count($selectedContacts) > 0)
     <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem; background: rgba(99,102,241,0.08); border-radius: 0.75rem; border: 1px solid rgba(99,102,241,0.15);">
         <span style="font-size: 0.85rem; font-weight: 600; color: var(--crm-tab-active-text);">{{ count($selectedContacts) }} {{ __('general.selected') }}</span>
         <button wire:click="bulkRestore" wire:confirm="Restore {{ count($selectedContacts) }} selected contact(s) to leads?" class="btn-success" style="font-size: 0.75rem; padding: 0.4rem 0.9rem;">{{ __('general.restore_selected') }}</button>
@@ -612,7 +614,9 @@
         <table>
             <thead>
                 <tr>
+                    @if(!($isGuest ?? false))
                     <th style="width: 1%;"><input type="checkbox" wire:model.live="selectAll" style="cursor: pointer;"></th>
+                    @endif
                     <th style="width: 20%;">{{ __('general.name_en_ar') }}</th>
                     <th style="width: 1%;">{{ __('general.relation') }}</th>
                     <th>{{ __('general.category') }}</th>
@@ -621,13 +625,17 @@
                     <th>{{ __('general.grade') }}</th>
                     <th>{{ __('general.age_at_oct_short') }}</th>
                     <th>{{ __('general.status') }}</th>
+                    @if(!($isGuest ?? false))
                     <th>{{ __('general.actions') }}</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
                 @forelse($contacts as $contact)
                 <tr>
+                    @if(!($isGuest ?? false))
                     <td><input type="checkbox" class="contact-checkbox" value="{{ $contact->id }}" wire:model.live="selectedContacts" style="cursor: pointer;"></td>
+                    @endif
             <td style="width: 20%; word-break: break-word; text-align: left;">
                 <div style="font-weight: 600; color: var(--crm-text);">
                     {{ app()->getLocale() === 'ar' ? $contact->nameAr : $contact->nameEn }}
@@ -685,9 +693,11 @@
                     </td>
                     <td><span class="badge">{{ app()->getLocale() === 'ar' ? ($contact->status_ar ?? __('general.' . strtolower($contact->status))) : $contact->status }}</span></td>
                     <td>
+                        @if(!($isGuest ?? false))
                         <a href="{{ route('contacts.edit', $contact) }}" wire:navigate class="btn-icon">{{ __('general.edit') }}</a>
                         <button wire:click="restore({{ $contact->id }})" wire:confirm="{{ __('contacts.restore_confirm') }}" class="btn-icon" style="color: #3b82f6; margin-left: 0.5rem;">{{ __('contacts.restore') }}</button>
                         <button wire:click="delete({{ $contact->id }})" wire:confirm="{{ __('contacts.delete_confirm') }}" class="btn-icon" style="color: #ef4444; margin-left: 0.5rem;">{{ __('general.delete') }}</button>
+                        @endif
                     </td>
                 </tr>
                 @empty
@@ -702,7 +712,7 @@
         </div>
     </div>
     @else
-    @if(count($selectedContacts) > 0)
+    @if(!($isGuest ?? false) && count($selectedContacts) > 0)
     <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem; background: rgba(99,102,241,0.08); border-radius: 0.75rem; border: 1px solid rgba(99,102,241,0.15);">
         <span style="font-size: 0.85rem; font-weight: 600; color: var(--crm-tab-active-text);">{{ count($selectedContacts) }} {{ __('general.selected') }}</span>
         <button wire:click="bulkRestore" wire:confirm="Restore {{ count($selectedContacts) }} selected contact(s) to leads?" class="btn-success" style="font-size: 0.75rem; padding: 0.4rem 0.9rem;">{{ __('general.restore_selected') }}</button>
@@ -801,9 +811,11 @@
                 @endif
             </div>
             <div class="card-actions">
+                @if(!($isGuest ?? false))
                 <a href="{{ route('contacts.edit', $contact) }}" wire:navigate class="btn-icon">{{ __('general.edit') }}</a>
                 <button wire:click="restore({{ $contact->id }})" wire:confirm="{{ __('contacts.restore_confirm') }}" class="btn-icon" style="color: #3b82f6;">{{ __('contacts.restore') }}</button>
                 <button wire:click="delete({{ $contact->id }})" wire:confirm="{{ __('contacts.delete_confirm') }}" class="btn-icon" style="color: #ef4444;">{{ __('general.delete') }}</button>
+                @endif
             </div>
         </div>
         @empty

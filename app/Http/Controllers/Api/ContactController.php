@@ -19,6 +19,7 @@ class ContactController extends Controller
             'student_affairs' => ['Student', 'Parent'],
             'academic' => ['Student'],
             'control' => ['Student'],
+            'guest' => ['Student', 'Parent'],
             default => null,
         };
 

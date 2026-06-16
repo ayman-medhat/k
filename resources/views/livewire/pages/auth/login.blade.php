@@ -64,19 +64,11 @@ new #[Layout('layouts.guest')] class extends Component
         <div class="flex items-center justify-end mt-4">
             <!-- Theme & Dark Mode Toggles -->
             <div style="display: flex; gap: 0.25rem; margin-right: auto;" class="theme-toggles">
-                <button @click="theme = theme === 'natural' ? 'default' : 'natural'; localStorage.setItem('theme', theme); document.documentElement.setAttribute('data-theme', theme);"
-                        x-show="theme === 'default'"
+                <button @click="appTheme = appTheme === 'default' ? 'natural' : appTheme === 'natural' ? 'forest' : 'default'; localStorage.setItem('appTheme', appTheme); document.documentElement.setAttribute('data-theme', appTheme);"
                         style="width: 2rem; height: 2rem; border-radius: 9999px; border: 1px solid var(--crm-border); background: var(--crm-input-bg); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; opacity: 0.55; transition: opacity 0.2s;"
                         onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.55'"
-                        title="{{ __('welcome.theme_brown') }}" x-cloak>
-                    🌰
-                </button>
-                <button @click="theme = theme === 'natural' ? 'default' : 'natural'; localStorage.setItem('theme', theme); document.documentElement.setAttribute('data-theme', theme);"
-                        x-show="theme === 'natural'"
-                        style="width: 2rem; height: 2rem; border-radius: 9999px; border: 1px solid var(--crm-border); background: var(--crm-input-bg); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; opacity: 0.55; transition: opacity 0.2s;"
-                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.55'"
-                        title="{{ __('welcome.theme_default') }}" x-cloak>
-                    🎨
+                        title="{{ __('welcome.theme') }}">
+                    <span x-text="appTheme === 'default' ? '🌞' : appTheme === 'natural' ? '🌰' : '🌿'"></span>
                 </button>
                 <button @click="darkMode = !darkMode"
                         style="width: 2rem; height: 2rem; border-radius: 9999px; border: 1px solid var(--crm-border); background: var(--crm-input-bg); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; opacity: 0.55; transition: opacity 0.2s;"
@@ -95,6 +87,10 @@ new #[Layout('layouts.guest')] class extends Component
             <x-primary-button class="ms-3">
                 {{ __('auth.login') }}
             </x-primary-button>
+            <a href="{{ route('login.guest') }}"
+               class="ms-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition ease-in-out duration-150">
+                {{ __('auth.demo_guest') }}
+            </a>
         </div>
     </form>
 </div>

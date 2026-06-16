@@ -76,6 +76,7 @@ class Manage extends Component
             'academic' => ['Student'],
             'control' => ['Student'],
             'parent' => [],
+            'guest' => ['Student', 'Parent'],
             default => null,
         };
 
@@ -117,6 +118,7 @@ class Manage extends Component
 
     public function translateAllNames()
     {
+        abort_if(auth()->user()->isGuest(), 403);
         $count = 0;
         Contact::whereNotNull('nameAr')->where('nameAr', '!=', '')->each(function ($contact) use (&$count) {
             $latin = ArabicTransliterator::toLatin($contact->nameAr);
@@ -136,6 +138,7 @@ class Manage extends Component
 
     public function delete($id)
     {
+        abort_if(auth()->user()->isGuest(), 403);
         $contact = Contact::findOrFail($id);
         User::where('email', $contact->email)->whereNotNull('lead_id')->delete();
         $contact->delete();
@@ -191,6 +194,7 @@ class Manage extends Component
             'academic' => ['Student'],
             'control' => ['Student'],
             'parent' => [],
+            'guest' => ['Student', 'Parent'],
             default => null,
         };
 
@@ -232,6 +236,7 @@ class Manage extends Component
             'categoryCounts' => $categoryCounts,
             'totalCount' => $totalCount,
             'allowedCategories' => $validCategories,
+            'isGuest' => auth()->user()->isGuest(),
         ]);
     }
 }

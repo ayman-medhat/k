@@ -23,7 +23,6 @@ return [
     'powered_by' => 'مدعوم من Kashmos',
     'scroll_top' => 'العودة للأعلى',
     'established' => 'تأسست',
-    'theme_brown' => 'التبديل للمظهر البني',
-    'theme_default' => 'التبديل للمظهر الافتراضي',
+    'theme' => 'تبديل المظهر',
     'dark_mode' => 'تبديل الوضع الليلي',
 ];

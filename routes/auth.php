@@ -13,6 +13,22 @@ Route::middleware('guest')->group(function () {
     Volt::route('login', 'pages.auth.login')
         ->name('login');
 
+    Route::get('login/guest', function () {
+        $user = \App\Models\User::where('email', 'guest@example.com')->first();
+
+        if (! $user) {
+            return redirect()->route('login')->withErrors([
+                'email' => __('auth.guest_not_found'),
+            ]);
+        }
+
+        \Illuminate\Support\Facades\Auth::login($user);
+
+        request()->session()->regenerate();
+
+        return redirect()->intended(route('dashboard'));
+    })->name('login.guest');
+
     Route::post('login', function (\Illuminate\Http\Request $request) {
         $credentials = $request->validate([
             'email' => ['required', 'email'],

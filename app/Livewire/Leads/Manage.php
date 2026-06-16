@@ -111,6 +111,7 @@ class Manage extends Component
             'control' => ['Student'],
             // Parents see only 'Student' category leads (their children)
             'parent' => ['Student'],
+            'guest' => ['Student', 'Parent'],
             default => null,
         };
 
@@ -148,12 +149,14 @@ class Manage extends Component
 
     public function delete($id)
     {
+        abort_if(auth()->user()->isGuest(), 403);
         Lead::findOrFail($id)->delete();
         User::where('lead_id', $id)->delete();
     }
 
     public function translateAllNames()
     {
+        abort_if(auth()->user()->isGuest(), 403);
         $count = 0;
         Lead::whereNotNull('nameAr')->where('nameAr', '!=', '')->each(function ($lead) use (&$count) {
             $latin = ArabicTransliterator::toLatin($lead->nameAr);
@@ -206,6 +209,7 @@ class Manage extends Component
 
     public function accept($id)
     {
+        abort_if(auth()->user()->isGuest(), 403);
         $lead = Lead::with('parent', 'mother')->findOrFail($id);
 
         $parentContact = null;
@@ -255,6 +259,7 @@ class Manage extends Component
     // ----------------------------------------------------------
     public function refuse($id)
     {
+        abort_if(auth()->user()->isGuest(), 403);
         $lead = Lead::findOrFail($id);
         $lead->update(['status' => 'Refused']);
         $this->message = "Lead refused.";
@@ -311,6 +316,7 @@ class Manage extends Component
             'control' => ['Student'],
             // Parents see only their children's leads (Student category)
             'parent' => ['Student'],
+            'guest' => ['Student', 'Parent'],
             default => null,
         };
 
@@ -363,6 +369,7 @@ class Manage extends Component
             'totalCount' => $totalCount,
             'allowedCategories' => $validCategories,
             'isParent' => $isParent,
+            'isGuest' => $user->isGuest(),
         ]);
     }
 }

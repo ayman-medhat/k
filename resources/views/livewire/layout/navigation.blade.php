@@ -31,6 +31,7 @@ $allowedSections = $user
         'academic' => ['academic'],
         'control' => ['control'],
         'parent' => ['parent'],
+        'guest' => ['students'],
         default => ['students', 'hr', 'academic', 'control', 'admin'],
     }
     : [];

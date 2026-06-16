@@ -76,6 +76,7 @@ class ManageForm extends Component
 
     public function mount(?Lead $lead = null)
     {
+        abort_if(auth()->user()->isGuest(), 403);
         $this->lead = $lead;
 
         if ($lead) {
@@ -383,6 +384,7 @@ class ManageForm extends Component
 
     public function save()
     {
+        abort_if(auth()->user()->isGuest(), 403);
         $this->validate();
 
         if ($this->nationality === 'Egyptian' && $this->national_id) {

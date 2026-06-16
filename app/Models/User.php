@@ -59,6 +59,11 @@ class User extends Authenticatable
         return $this->role === 'student';
     }
 
+    public function isGuest(): bool
+    {
+        return $this->role === 'guest';
+    }
+
     // ----------------------------------------------------------
     // Link the user account to a Lead record (parent lead_id FK)
     // Used by parent dashboard and ensureUserForLead()

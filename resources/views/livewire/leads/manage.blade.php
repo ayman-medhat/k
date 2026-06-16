@@ -566,7 +566,7 @@
                     {{ __('general.cards') }}
                 </button>
             </div>
-            @if(!$isParent)
+            @if(!$isParent && !($isGuest ?? false))
             <a href="{{ route('leads.import') }}" wire:navigate class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.import') }}</a>
             <a href="{{ route('leads.export') }}" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('general.export') }}</a>
             <button wire:click="translateAllNames" class="btn-secondary" style="margin-right: 0.5rem;">{{ __('leads.translate_all') }}</button>
@@ -639,7 +639,7 @@
         <table>
             <thead>
                 <tr>
-                    @if(!$isParent)
+                    @if(!$isParent && !($isGuest ?? false))
                     <th style="width: 1%;">
                         <input type="checkbox" wire:model.live="selectAll" style="cursor: pointer;">
                     </th>
@@ -652,7 +652,7 @@
                     <th>{{ __('general.grade') }}</th>
                     <th>{{ __('general.age_at_oct_short') }}</th>
                     <th>{{ __('general.status') }}</th>
-                    @if(!$isParent)
+                    @if(!$isParent && !($isGuest ?? false))
                     <th>{{ __('general.actions') }}</th>
                     @endif
                 </tr>
@@ -660,7 +660,7 @@
             <tbody>
                 @forelse($leads as $lead)
                 <tr>
-                    @if(!$isParent)
+                    @if(!$isParent && !($isGuest ?? false))
                     <td>
                         @if($lead->status !== 'Accepted')
                         <input type="checkbox" class="lead-checkbox" value="{{ $lead->id }}" wire:model.live="selectedLeads" style="cursor: pointer;">
@@ -724,7 +724,7 @@
                         @endif
                     </td>
                     <td><span class="badge">{{ app()->getLocale() === 'ar' ? ($lead->status_ar ?? __('general.' . strtolower($lead->status))) : $lead->status }}</span></td>
-                    @if(!$isParent)
+                    @if(!$isParent && !($isGuest ?? false))
                     <td>
                         @if($lead->status === 'Accepted')
                         <span style="color: #059669; font-weight: 600; font-size: 0.8rem;">{{ __('leads.transferred') }}</span>
@@ -834,7 +834,7 @@
             <div class="card-actions">
                 @if($lead->status === 'Accepted')
                 <span style="color: #059669; font-weight: 600; font-size: 0.85rem;">{{ __('leads.transferred_to_contacts') }}</span>
-                @elseif(!$isParent)
+                @elseif(!$isParent && !($isGuest ?? false))
                 <a href="{{ route('leads.edit', $lead) }}" wire:navigate class="btn-icon">{{ __('general.edit') }}</a>
                 <button wire:click="accept({{ $lead->id }})" wire:confirm="{{ __('leads.accept_confirm') }}" class="btn-icon" style="color: #10b981;">{{ __('leads.accept') }}</button>
                 <button wire:click="refuse({{ $lead->id }})" wire:confirm="{{ __('leads.refuse_confirm') }}" class="btn-icon" style="color: #f59e0b;">{{ __('leads.refuse') }}</button>

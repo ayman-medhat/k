@@ -23,7 +23,6 @@ return [
     'powered_by' => 'Powered by Kashmos',
     'scroll_top' => 'Scroll to top',
     'established' => 'Established',
-    'theme_brown' => 'Switch to brown theme',
-    'theme_default' => 'Switch to default theme',
+    'theme' => 'Switch theme',
     'dark_mode' => 'Toggle dark mode',
 ];
